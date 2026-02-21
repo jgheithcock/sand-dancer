@@ -24,7 +24,23 @@ Sand-Dancer
 =><=============
 S A N D - D A N C E R
 
-(display:'inventory')
+(display:'inventory')\
+<!-- Logging -->\
+(set: $Log to (macro: any-type _toLog,[
+  (if: $TheLog is 0)[(set: $TheLog to '')]
+  (set: $TheLog to it + (_toLog) + '\n')
+  (out-data:'')
+]))\
+<!-- Text utilities -->\
+(set: $tab to "&nbsp;&nbsp;")\
+<!-- Set up -->\
+($addToInventory: 'a lighter')\
+($addToInventory: 'a denim jacket')\
+($addToInventory: 'a wallet')\
+($addToInventory: 'a folded photo')\
+($addToInventory: 'emotional baggage')\
+($moveToLoc: 'grandma\'s stories', 'emotional baggage')\
+(set: $broodedMemories to (ds:))\
 
 
 :: header [header] {"position":"325,100","size":"100,100"}
@@ -39,11 +55,98 @@ S A N D - D A N C E R
   'box-shadow', '.1em 1em 2em .2em rgba(0,0,0,.2)'
 ))\
 ($createInventory: "Stuff you are carrying...", "left", _style)\
- (append: ?sidebar)[(link-repeat:"Stuff")[($showInventory:)]]
+ (append: ?sidebar)[(link-repeat:"Stuff...")[($showInventory:)]]
 
 
 :: inventory {"position":"575,100","size":"100,100"}
 (display:'overlay')\
+(if: $locOf is 0)[\
+  (set: $locOf to (dm:))\
+  (set: $itemsAt to (dm:))\
+]\
+(set: $moveToLoc to (macro: str-type _item, str-type _loc, [
+  (if: $locOf contains _item)[
+    (set: _oldLoc to ($locOf)'s _item)
+    (if: $itemsAt contains _oldLoc)[
+      (set: ($itemsAt)'s _oldLoc to it - (a:_item))
+    ]
+  ]
+  (unless: $itemsAt contains _loc)[
+    (set: $itemsAt to it + (dm: _loc, (a:)))
+  ]
+  (set: ($itemsAt)'s _loc to it + (a: _item))
+  (set: $locOf to it + (dm: _item, _loc))
+  (replace:?you-can-also-see)[($youCanAlsoSeeContents:)]
+  ($updateInventory:)
+  (out-data:'')
+]))\
+(set: $itemLoc to (macro: str-type _item, [
+  (if: $locOf contains _item)[(out-data: $locOf's _item)]
+  (else:)[(out-data:'offstage')]
+]))\
+(set: $addToHere to (macro: str-type _item,[
+  (set: _loc to (passage:)'s name)
+  ($moveToLoc: _item, _loc)
+  (out-data:'')
+]))\
+(set: $addToInventory to (macro: str-type _item,[
+  ($moveToLoc: _item, 'inventory')
+  (out-data:'')
+]))\
+(set: $removeFromInventory to (macro: str-type _item,[
+  (set: _loc to (passage:)'s name)
+  ($moveToLoc: _item, _loc)
+  (out-data:'')
+]))\
+(set: $removeFromGame to (macro: str-type _item,[
+  ($moveToLoc: _item, 'offstage')
+  (out-data:'')
+]))\
+(set: $inventory to (macro: [
+  (out-data: ($itemsAt)'s 'inventory')
+]))\
+(set: $itemsIn to (macro: str-type _loc, [
+  (unless: $itemsAt contains _loc)[(set: $itemsAt to it + (dm: _loc, (a:)))]
+  (out-data: ($itemsAt)'s _loc)
+]))\
+(set: $itemLinkAlias to (macro: str-type _title, str-type _item, [
+  (out:)[(link-repeat:_title)[ _item]]<!-- TODO - examine item -->
+]))\
+(set: $itemLink to (macro: str-type _item, [
+  (out:)[($itemLinkAlias: _item, _item)]
+]))\
+(set: $itemsAsLinks to (macro: str-type _loc, [
+  (set: _items to ($itemsIn: _loc))
+  (set: _links to (a:))
+  (for: each _item, ...(_items))[(set: _links to it + (a:($itemLink: _item)))]
+  (out-data: _links)
+]))\
+(set: $localItemsAsLinks to (macro: [
+  (out-data: ($itemsAsLinks: (passage:)'s name))
+]))\
+(set: $itemIsFixedInPlace to (macro: str-type _item, [
+  (set: _itemsTags to ((passage:_item)'s tags))
+  (if: _itemsTags contains 'fixed-in-place')[(out-data:true)]
+  (if: _itemsTags contains 'memory')[(out-data:true)]
+  (out-data:false)
+]))\
+(set: $itemIsDroppable to (macro: str-type _item, [
+  (unless: ($inventory:) contains _item)[(out-data:false)]
+  (out-data: not ($itemIsFixedInPlace: _item))
+]))\
+(set: $itemIsObtainable to (macro: str-type _item, [
+  (if: ($inventory:) contains _item)[(out-data:false)]
+  (out-data: not ($itemIsFixedInPlace: _item))
+]))\
+(set: $updateInventory to (macro:[
+  (replace: ?inventory-content)[($contentsOfList:'inventory')]
+  (out-data:'')
+]))\
+(set: $showInventory to (macro: [
+  (show: ?inventory)
+  ($updateInventory:)
+  (out-data:'')
+]))\
 (set: $createInventory to (macro: str-type _caption, str-type _placement, dm-type _style,[
   (set: _title to [\
     |||||||||||||||||||=
@@ -54,18 +157,55 @@ S A N D - D A N C E R
   ])
   (out:)[($createOverlay: 'inventory', _title, _placement, _style) (hide:?inventory)]
 ]))\
-(set: $showInventory to (macro: [
-  (show: ?inventory)
-  (out-data:'')
+(set: $youCanAlsoSeeContents to (macro:[
+  (set: _printLinks to (macro: array-type _links, [
+    (if:_links's length is 1)[
+      (out:)[(source:(_links's 1st))]
+    ](else-if:_links's length is 2)[
+      (out:)[(source:_links's 2ndLast) and (source:_links's last)]
+    ](else:)[
+      (out:)[(for: each _i, ...(_links's 1stTo3rdLast))[_i, ](source:_links's 2ndLast) and (source:_links's last)]
+    ]
+  ]))\
+  (set: _links to ($localItemsAsLinks:))\
+  (if: _links's length is 0)[
+    (out:)[]
+  ](else:)[
+    (out:)[
+      You can see (_printLinks: _links).
+    ]
+  ]
+]))\
+(set: $youCanAlsoSee to (macro:[
+  (out:)[[($youCanAlsoSeeContents:)]<you-can-also-see|]
+]))\
+(set: $contentsOfList to (macro: str-type _container, [
+  (set: _links to ($itemsAsLinks:_container))\
+  (if: _links's length is 0)[
+    (out:)[nothing]
+  ](else:)[
+    (out:)[\
+      (for: each _i, ..._links)[$tab - _i
+      ]\
+    ]
+  ]
+]))\
+(set: $contentsOf to (macro: str-type _container, [
+  (out:)[(hook:'contents-of-'+_container)[($contentsOfList:_container)]]
 ]))
 
 
-:: middle of nowhere [Tower-Vicinity] {"position":"200,225","size":"100,100"}
+:: middle of nowhere {"position":"200,350","size":"100,100"}
+(if: visits is 1)[\
+($addToHere:'a glove box')\
+($addToHere:'a piece of jade')\
+]\
 # Middle of Nowhere
 You've smashed up against a tall Saguaro, which is all you can see out the windshield except a few feet of desert sand, then blackness. Hell, you must have driven off the road and crashed. Ocean keeps telling you this night commute on this lonely highway's gonna kill you; maybe you should start listening.
 
-Through the windshield, you see a brown lizard clinging frantically to the tall Saguaro.
-
+Through the windshield, you see a little brown-colored lizard clinging frantically to the tall Saguaro.
+($youCanAlsoSee:)
+[[Get out of the truck ->outside your truck]]and see how bad it is...
 
 
 :: overlay [overlay] {"position":"450,100","size":"100,100"}
