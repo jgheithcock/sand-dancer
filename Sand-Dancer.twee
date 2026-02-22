@@ -11,10 +11,20 @@ Sand-Dancer
   "tag-colors": {
     "startup": "yellow",
     "overlay": "yellow",
-    "header": "blue"
+    "footer": "purple",
+    "header": "blue",
+    "item": "yellow",
+    "memory": "purple",
+    "fixed-in-place": "purple",
+    "Tower-Vicinity": "red"
   },
   "zoom": 1
 }
+
+
+:: Ocean's baby [fixed-in-place] {"position":"325,1100","size":"100,100"}
+### Ocean's baby
+Your baby too.
 
 
 :: Startup [startup] {"position":"200,100","size":"100,100"}
@@ -25,6 +35,7 @@ Sand-Dancer
 S A N D - D A N C E R
 
 (display:'inventory')\
+(display:'examine')\
 <!-- Logging -->\
 (set: $Log to (macro: any-type _toLog,[
   (if: $TheLog is 0)[(set: $TheLog to '')]
@@ -33,6 +44,56 @@ S A N D - D A N C E R
 ]))\
 <!-- Text utilities -->\
 (set: $tab to "&nbsp;&nbsp;")\
+<!-- linkPersist & linkRevealPersist -->\
+<!-- Support for persistent links (once clicked, continue to show revealed content) -->\
+(set: $persistCounter to (dm:))(set: $persistTotal to (dm:))(set: $visitedLinks to (ds:))\
+(set: $linkPersister to (macro: str-type _linkType, str-type _title, codehook-type _content, [
+    <!-- Called for each 'linkPersist' in passage -->
+    (set: _page to ((passage:)'s name))
+    (if: $persistCounter does not contain _page)[(set: $persistCounter to it + (dm:_page, 0))]
+    (set: _totalLinks to _page of $persistCounter)
+    (if: $persistTotal does not contain _page)[(set: $persistTotal to it + (dm:_page, _totalLinks))]
+    (set: _linkCount to 1 + _page of $persistCounter)
+    (if: visits > 1)[<!-- handle wrap-around on future visits-->
+        (set: _linkTotal to _page of $persistTotal)
+        (if: _linkCount > _linkTotal)[(set: _linkCount to 1)]
+    ]
+    (set: $persistCounter to it + (dm:_page, _linkCount))
+    (set: _linkID to (str: _page, "-", (str:_linkCount)))
+    (if: $visitedLinks does not contain _linkID)[
+        <!-- Not yet visited, show link -->
+        (if: _linkType is 'link-reveal')[
+            (out:)[(link-reveal:_title)[(set:$visitedLinks to it + (ds:_linkID))_content]]
+        ](else:)[
+            (out:)[(link:_title)[(set:$visitedLinks to it + (ds:_linkID))_content]]
+        ]
+    ](else:)[
+        <!-- Has been visited, just show content -->
+        (if: _linkType is 'link-reveal')[
+            (out:)[(str:_title,_content)]
+        ](else:)[
+            (out:)[(str:_content)]
+        ]
+    ]
+]))<!-- end of linkPersister -->\
+(set: $linkPersist to (macro: str-type _title, codehook-type _content, [
+	(out:)[($linkPersister:'link', _title, _content)]
+]))\
+(set: $linkRevealPersist to (macro: str-type _title, codehook-type _content, [
+	(out:)[($linkPersister:'link-reveal', _title, _content)]
+]))\
+<!-- `visits` doesn't work for `display` so use this instead -->\
+(set: $first to (macro: str-type _item, [
+  (if: $visitItems is 0)[
+    (set: $visitItems to (dm:))
+  ]
+  (if: $visitItems contains _item)[
+    (set: $visitItems to it + (dm: _item, ($visitItems's _item) + 1))
+  ](else:)[
+    (set: $visitItems to it + (dm: _item, 1))
+  ]
+  (out-data: $visitItems's _item is 1)
+]))\
 <!-- Set up -->\
 ($addToInventory: 'a lighter')\
 ($addToInventory: 'a denim jacket')\
@@ -41,6 +102,227 @@ S A N D - D A N C E R
 ($addToInventory: 'emotional baggage')\
 ($moveToLoc: 'grandma\'s stories', 'emotional baggage')\
 (set: $broodedMemories to (ds:))\
+<!-- Lighting -->\
+(set: $emergencyLightsOn to false)\
+(set: $flashLightOn to true)\
+(set: $litBrightly to (macro: str-type _loc, [
+  (set: _isTowerVicinity to (passage:)'s tags contains 'Tower-Vicinity')
+  (out-data: _isTowerVicinity and $emergencyLightsOn)
+]))\
+(set: $withinRangeOfHeadlights to (macro: str-type _loc, [
+  (out-data:(a:
+  'in pickup truck',
+  'middle of nowhere',
+  'backtracking',
+  'crubmling concrete',
+  'base of tower'
+ ) contains _loc)
+]))\
+(set: $litByFlashlight to (macro:[
+  (out-data: $flashLightOn and ($inventory:) contains 'flashlight')
+]))\
+(set: $locationIsLit to (macro:[
+  (set: _loc to (passage:)'s name)
+  (if: ($litBrightly: _loc))[
+    (out-data:'brightly')
+  ]
+  (else-if: ($withinRangeOfHeadlights: _loc))[
+    (out-data:'by headlights')
+  ](else-if: ($litByFlashlight:))[
+    (out-data:'by flashlight')
+  ](else:)[
+    (out-data:'dark')
+  ]
+]))
+
+
+:: a brown lizard [fixed-in-place] {"position":"325,600","size":"100,100"}
+(set: $lizardVisits to $lizardVisits + 1)\
+(if: $lizardVisits is 1)[\
+### A brown-colored lizard
+He looks pretty pissed that you crashed into his cactus. What did grandma used to call those little dudes? You can't remember any more.\
+](else-if: $lizardVisits is 2)[\
+### A brown-colored lizard
+Oh yeah, you remember, she called them sand-dancers. This little sand-dancer still looks pissed.\
+](else:)[\
+### A sand-dancer
+The little sand-dancer lizard stares at you with one slitted eye]
+
+
+:: a denim jacket {"position":"200,850","size":"100,100"}
+### Your denim jacket
+Not much to say, a bit thread-bare, but all you have to protect you from the cold.
+
+
+:: a driver's license [fixed-in-place] {"position":"450,975","size":"100,100"}
+### Your driver's license
+When the highway patrol pulls you over they see your kind of crazy uncombed hair (morning), your brown name (Nakaibito Morales) and brown skin (actually more kinda tan), your D.O.B. (eighteen years ago just barely) and tribal affiliation card (expired) and assume you're either some kind of native eco-terrorist, illegal drug-running border jumper, or delinquent high school dropout (all lies except for kinda maybe the last one a little). Unless it's Jimmy Kay who pulled you over since he usually just wants to buy you a beer and talk about your dad, which is weird but better than getting a ticket.
+
+
+:: a folded photo {"position":"200,1100","size":"100,100"}
+### A folded photo
+(if: $broodedMemories's length < 2)[\
+You just can't deal with that right now. Maybe after you've spent more time brooding.
+](else:)[\
+You open the photo, revealing an ultrasound of ($itemLink:"Ocean's baby").
+
+Something about the ultrasound of Ocean's baby makes you want to brood about ($itemLink:'when you heard the news').\
+($moveToLoc: 'when you heard the news', 'emotional baggage')\
+]
+
+
+:: a glove box [fixed-in-place] {"position":"200,475","size":"100,100"}
+($first:'a glove box')[\
+($moveToLoc:'a pack of cigarettes', 'a glove box')\
+]\
+### Inside the glove box
+($contentsOf:'a glove box')
+
+
+:: a lighter {"position":"200,725","size":"100,100"}
+### Your lighter
+A classic Zippo. You flick it open a few times.
+
+($itemLinkAlias:'Light a cigarette', 'report smoking') | \
+($itemLinkAlias:'Get a little light here', 'report lighter')
+
+
+:: a pack of cigarettes {"position":"325,725","size":"100,100"}
+($first: 'a pack of cigarettes')[(set: $cigs to 6)]\
+### A pack of cigarettes
+You're kind of trying to quit, but man, you could really go for one right now. (if: $cigs > 0)[It looks like you've only got (text: $cigs) left.
+
+You could (link:'light one up now')[($addToInventory:'a pack of cigarettes')($showItem:'report smoking'))].\
+](else:)[But you are totally out.]
+
+
+:: a piece of jade [item] {"position":"200,600","size":"100,100"}
+(metadata: 'inventory', 'item')
+### A piece of jade
+Grandma said it will bring you luck, which hasn't really been working out. You can't remember now how it ended up in your pickup truck. Maybe someday you'll see someone lucky and you can throw it at him.
+
+
+:: a receipt from Big Jimmy's [fixed-in-place] {"position":"325,975","size":"100,100"}
+($first: "a receipt from Big Jimmy's")[\
+($moveToLoc: 'your shit job', 'emotional baggage')]\
+### A receipt from Big Jimmy's
+Something about the receipt from Big Jimmy's makes you want to brood about ($itemLink:'your shit job').
+
+
+:: a rusty tin can {"position":"450,600","size":"100,100"}
+### A rusty tin can
+Someone left a tin can here years ago: ridged ripples run down its rusty side
+
+
+:: a wallet {"position":"200,975","size":"100,100"}
+($first: 'a wallet')[\
+($moveToLoc:'a driver\'s license', 'a wallet')\
+($moveToLoc:'a receipt from Big Jimmy\'s', 'a wallet')\
+]\
+### Your wallet
+In the wallet is:
+($contentsOf:'a wallet')
+
+
+:: a weather-worn guidebook {"position":"575,600","size":"100,100"}
+(set:_listOfAnimals to (macro: [
+  (set: _out to '')
+  (for: each _animal, ...$foundAnimals)[
+    (set: _out to it + '-' + (source: ($itemLink:_animal)) + '\n')
+  ]
+  (out-data:_out)
+]))
+###Weather-worn guidebook
+Most of the pages are faded or worn away, but flipping through, it looks like a guide to local animal life. You could try looking up various animals in it. Most of them you flip on by but you notice:
+
+(_listOfAnimals:)
+
+
+:: base of the tower {"position":"325,475","size":"100,100"}
+(if: visits is 1)[\
+($addToHere:'a rusty tin can')\
+]\
+# Base of the tower
+Behind the concrete building, featureless except for a dust-covered window, a steel girder rises from the desert sand, one of three legs of the huge electrical tower looming like some gargantuan spider into blackness above you. A tumbleweed drifts lazily against the rusted metal among scrawny weeds and crumbling trash. The desert stretches in all directions except [[back south->crumbling concrete]] or [[southeast->weed strewn rust]] towards the building.
+($youCanAlsoSee:)
+
+
+:: break the window [fixed-in-place] {"position":"575,475","size":"100,100"}
+Nice thought, but the last thing you need is a sliced open hand. Maybe you could use something less likely to bleed.
+
+
+:: crumbling concrete [Tower-Vicinity] {"position":"450,350","size":"100,100"}
+# Crumbling Concrete
+This concrete building must've been some sort of utility structure for the [[huge electrical tower to the north->base of the tower]], now abandoned: a ($linkRevealPersist:'pane of cracked glass',[(set: $windowExamined to true)(show:?examine-window)]) sparkles faintly in the beam of your headlights. \
+[(if:$windowbroken is true)[The empty frame of a window leads inside.](else:)[You push your face against the dusty glass window but it is too dark to see inside.(show:?suggest-break)
+]
+](examine-window|\
+Tendrils of desert sand drift against a ($linkRevealPersist: 'boarded-up door to the northeast',[(set:$triedDoor to true)(hide: ?untriedDoor)(show: ?triedDoor)])(t8n:"dissolve")[ leading inside; you could also ]<untriedDoor|(t8n:"dissolve")[. You shove against the door with all your weight. The door won't budge. You slam your hands against the boards in frustration. I guess you could ](triedDoor|[[walk around to the east->weed strewn rust]] or [[head south->outside your truck]] back to your truck.[(t8n:'fade')+(transition-time:3s)+(transition-delay:1s)[ Or, you could try to ($itemLink:'break the window')]](suggest-break|\
+(if:$triedDoor is true)[(hide: ?untriedDoor)(show: ?triedDoor)]\
+(if:$windowExamined is true)[(show: ?examine-window)]
+
+
+:: emotional baggage [fixed-in-place] {"position":"200,225","size":"100,100"}
+### Emotional baggage
+Your guidance counselor used to say you're always carrying it with you. You imagine it's kind of ugly, lumpy, and green, and definitely has a stuck zipper.
+(if: ($itemsIn:'emotional baggage')'s length > 1)[\
+Right now, you are carrying around...](else:)[The only thing you can brood about now is ]
+
+($contentsOf:'emotional baggage')
+You are pretty sure there is plenty of other stuff burried in that bag, but you can't deal with any of it right now.
+
+
+:: examine {"position":"700,100","size":"100,100"}
+(set: $showItem to (macro: str-type _item, [
+  (if: $itemHistory is 0)[($clearItemHistory:)]
+  (if: $itemHistory does not contain _item)[
+    (set: $itemHistory to it + (a:_item))
+  ]
+  (show: ?examine)
+  (replace: ?examine-content)[\
+    (display:_item)
+    ==><=
+    ($itemLinks: _item)
+  ]
+  (out-data:'')
+]))\
+(set: $clearItemHistory to (macro: [
+  (set: $itemHistory to (a:))
+  (out-data:'')
+]))\
+(set: $createExam to (macro: str-type _placement, dm-type _style,[
+  (out:)[($createOverlay: 'examine', '', _placement, _style) (hide:?examine)]
+]))\
+(set: $itemLinks to (macro: str-type _item, [
+  (set: _ok to [
+    (if: $itemHistory's length > 1)[
+      (set: $itemHistory to it - (a:$itemHistory's last))
+      ($showItem:$itemHistory's last)
+    ](else:)[
+      ($clearItemHistory:)
+      (hide:?examine)
+    ]
+  ])
+  (set: _addPrompt to (either:"Snag it", "Take it", "Grab it"))
+  (set: _add to [(link:_addPrompt)[($addToInventory:_item)(_ok)]])
+  (set: _dropPrompt to (either:"Drop it", "Leave it", "Set it down"))
+  (set: _drop to [(link:_dropPrompt)[($removeFromInventory:_item)(_ok)]])
+  (set: _throwable to ())
+  (set: _throw to [])
+  (out:)[
+    (if: ($itemIsDroppable: _item))[_drop | ]\
+    (if: ($itemIsObtainable: _item))[_add | ]\
+    (link-repeat: 'Done')[(_ok)]
+  ]
+]))
+
+
+:: grandma's stories [memory] {"position":"325,225","size":"100,100"}
+(set: $broodedMemories to it + (ds:"grandma's stories"))\
+### Grandma's stories
+"There are dark spirits who roam the earth, little Knock." Grandma used to say that, holding you tight and stroking your hair. "There are dark spirits who roam the earth, but you're not alone. Oh, no. I'm here." (She'd kiss your head and you'd squeeze her back.) "But others are watching out for you too. You have three animal guardians, hmm? Spirits who are always watching over you. Oh, you can't always trust them to know what's best. Remember that, Knock. But when you need help, they'll come, and protect you from the worser things in the world."
+
+Mom would yell at Grandma a lot for filling your head with that new-age bullshit. Grandma grew up white and midwestern and Baptist, but had started wearing things with feathers and playing the pan flute by the time you were born. She seemed to really like having a son-in-law who was Native American or American Indian or Indigenous Peoples or whatever she'd decided the term was that week, and she was pretty pissed when mom left him. Anyway. Her stories were mostly BS, you guess, but some of them stuck with you. When it's dark you still wonder if your spirit animals are out there somewhere, and what the hell is taking them so long to find you.
 
 
 :: header [header] {"position":"325,100","size":"100,100"}
@@ -51,10 +333,19 @@ S A N D - D A N C E R
   'background-color', 'rgba(241, 233, 210, .95)',
   'border', '1px solid #fff',
   'border-color', '#211100',
+  'border-radius', '0 16px 16px 0',
   'color', '#211100',
   'box-shadow', '.1em 1em 2em .2em rgba(0,0,0,.2)'
 ))\
 ($createInventory: "Stuff you are carrying...", "left", _style)\
+(set: _examineStyle to _style + (dm:
+  'width', '50vw',
+  'height', 'auto',
+  'top', '15vh',
+  'max-height', '75vh',
+  'border-radius', '16px'
+))\
+($createExam: 'center', _examineStyle)\
  (append: ?sidebar)[(link-repeat:"Stuff...")[($showInventory:)]]
 
 
@@ -110,7 +401,7 @@ S A N D - D A N C E R
   (out-data: ($itemsAt)'s _loc)
 ]))\
 (set: $itemLinkAlias to (macro: str-type _title, str-type _item, [
-  (out:)[(link-repeat:_title)[ _item]]<!-- TODO - examine item -->
+  (out:)[(link-repeat:_title)[($showItem: _item)]]
 ]))\
 (set: $itemLink to (macro: str-type _item, [
   (out:)[($itemLinkAlias: _item, _item)]
@@ -195,17 +486,38 @@ S A N D - D A N C E R
 ]))
 
 
-:: middle of nowhere {"position":"200,350","size":"100,100"}
+:: lizard, brown [fixed-in-place] {"position":"700,600","size":"100,100"}
+You look up the brown-colored lizard in the guidebook and quickly identify it: those eyes are a dead giveaway. The entry says it's a 'rare subspecies of the common desert lizard found only in the deep desert near Oro Oeste, and known to native peoples as a //sand-dancer//. In legends, the sand-dancer was a clever trickster and twister of words, who created night by tricking the sun into spending half the day underground.'
+
+Huh.
+
+
+:: middle of nowhere [Tower-Vicinity] {"position":"200,350","size":"100,100"}
 (if: visits is 1)[\
 ($addToHere:'a glove box')\
 ($addToHere:'a piece of jade')\
+(set: $foundAnimals to (ds:'lizard, brown'))\
 ]\
 # Middle of Nowhere
 You've smashed up against a tall Saguaro, which is all you can see out the windshield except a few feet of desert sand, then blackness. Hell, you must have driven off the road and crashed. Ocean keeps telling you this night commute on this lonely highway's gonna kill you; maybe you should start listening.
 
-Through the windshield, you see a little brown-colored lizard clinging frantically to the tall Saguaro.
+Through the windshield, you see ($itemLinkAlias:'a little brown-colored lizard','a brown lizard') clinging frantically to the tall Saguaro.
 ($youCanAlsoSee:)
 [[Get out of the truck ->outside your truck]]and see how bad it is...
+
+
+:: outside your truck [Tower-Vicinity] {"position":"325,350","size":"100,100"}
+# Looking around
+The tire tracks from the south stop abruptly here, but where the hell are you? The desert sand and clumps of pale sagebrush are all your dimming headlights pick out before barely reaching the concrete building to [[the north->crumbling concrete]].
+
+Your poor ($linkRevealPersist:'old pickup truck',[(set: $truckExamined to true)(show: ?examine-truck)]) ticks and groans, smashed gracelessly against a tall Saguaro; whiffs of evaporating gasoline linger in the chill air.[
+
+Getting down on your knees in the cold sand, you look underneath. Sure enough; you ripped up the fuel line and all your gas has drained away, sucked dry by the thirsty desert sand. You'll need to find some way to patch up the line, plus some fuel, to have any hope of fixing her.](examine-truck|
+
+A ($itemLinkAlias:'brown-colored lizard', 'a brown lizard') clings to a tall Saguaro.
+($youCanAlsoSee:)
+[[Get back in your truck->middle of nowhere]] | [[Head north->crumbling concrete]]\
+(if: $truckExamined is true)[(show: ?examine-truck)]
 
 
 :: overlay [overlay] {"position":"450,100","size":"100,100"}
@@ -314,6 +626,104 @@ Through the windshield, you see a little brown-colored lizard clinging frantical
   (hook:_hookName + '-content')[]\
   ]]
 ]))
+
+
+:: report lighter [fixed-in-place] {"position":"575,725","size":"100,100"}
+You flick it open and shut a few times, an old habit.
+
+<!--
+Different messages depending on where you are and the lighting condition.
+
+
+if it's effectively dark, say "You flick the lighter, but the light seems grey and tiny in the face of the dark. All you can really see is[if location is Staging Area] [a desk] by your feet, and[end if][if there is at least one brighter direction] a slightly brighter place to [the list of brighter directions][otherwise] your shivering hand[end if]. As your thumb starts to burn you let the puny light go out.";
+	otherwise say "You flick it open and shut a few times, an old habit."
+-->
+
+
+:: report smoking [fixed-in-place] {"position":"450,725","size":"100,100"}
+<!-- clearItemHistory so that clicking Done takes you to the passage, not back to the glove box or wherever you started -->\
+($clearItemHistory:)\
+(set: _reportLight to (macro:[
+  (set: _litBy to ($locationIsLit:))
+  (if: _litBy is 'brightly')[
+    (out-data:"You've finally lit the place up a little.")
+  ](else-if:_litBy is 'by headlights')[
+    (out-data:"It's dark outside the beam of your headlights.")
+  ](else-if: _litBy is 'by flashlight')[
+    (out-data: "It's pitch black outside the beam of your flashlight.")
+  ](else:)[
+    (out-data:"It's darker than you can remember it ever being.")
+  ]
+]))\
+(set: _hint to (macro:[
+  (set: _loc to (passage:)'s name)
+  (if: _loc is "middle of nowhere")[
+    (out-data:"you could start by getting out of this truck")
+  ](else-if: (not (visited:'crumbling concrete')))[
+    (out-data:"you could start by looking around the area, seeing if maybe there's a phone or something")
+  ]
+  (out-data:"you could... man, I don't know...")
+]))\
+### Smoke...
+(unless: ($inventory:) contains 'a lighter')[\
+You pat your pockets, but can't seem to find your lighter.
+](else:)[= \
+(unless: ($inventory:) contains 'a pack of cigarettes')[\
+You slip your hand into your pocket and remember you don't have your smokes on you.
+](else:)[= \
+(if: $cigs is 0)[
+You're out of cigarettes.
+](else:)[= (set: $cigs to it - 1)\
+You pull out a cigarette and flick it into life. Thoughts tumble through your head.
+
+Well, you're still stuck here. [(_reportLight:)] Maybe [(_hint:)].
+
+And you still haven't quit smoking. (if:$cigs is 0)[That was your last cigarette, too.](else:)[You've got (plural:$cigs, "cig", "cigs") left.]
+
+
+:: the last day of high school [memory] {"position":"700,225","size":"100,100"}
+(set: $broodedMemories to it + (ds:"the last day of high school"))\
+### The last day of high school
+You didn't expect it was going to be your last day. But that morning you got called in to the principal's office and fat bald Mr. Cox and pissy old Mrs. Burke were there, and they looked kind of like strong animals stalking weak animals, and you knew something bad was up.
+
+Cox said I have here, Mr. Morales (a bad start since you hate that name) a test you took last week in Mrs. Burke's sophomore English class. Questions have been raised (he looked up at Mrs. Burke like he was trying to pass the buck) questions have been raised about the quality of your essay, and whether a student with your academic and behavioral record (he scratched his bloated nose meaningfully) could have plausibly produced such an essay, and you get the idea. They thought you cheated.
+
+No. They knew you cheated, deep in their smug empty hearts. They wanted you to admit it, say you were a cheater and a liar. But you weren't. You wrote that essay, every god damn word, because you really really liked the book for once and wanted to show Mrs. Burke that maybe if they gave people better books to read kids would actually learn something. But they wanted a confession. They wanted a thieving example they could parade in front of the school. Someone of your academic and behavioral and economic and racial background and yeah, screw this shit. So you got up and left and never came back. Drop out, hell. You walked out and you'd do it again.
+
+
+:: weed strewn rust {"position":"450,475","size":"100,100"}
+#Weed-strewn Rust
+Behind the rather small concrete building and its tiny frosted window is nothing but a scraggly patch of yellowing weeds and dirt near a leaking pipe, littered by a collection of rusted barrels and some scattered newspapers. Desert stretches in all directions; [[back west->crumbling concrete]] is the front of the building.
+
+|guide-book>[Atop one overturned barrel is (link:'a weather-worn guidebook')[($addToInventory:'a weather-worn guidebook')($showItem:'a weather-worn guidebook')(t8n:'fade')(transition-delay:1s)[(hide:?guide-book)]]
+
+]The cold night air swirls around you, and you pull your jacket closer.
+
+(if: visits is 1)[Something about the weather-worn guidebook makes you want to brood about ($itemLink:'the last day of high school').]\
+($moveToLoc:'the last day of high school', 'emotional baggage')\
+(if: ($itemLoc:'a weather-worn guidebook') is 'offstage')[(show: ?guide-book)]
+
+
+:: when you heard the news [memory] {"position":"575,225","size":"100,100"}
+(set: $broodedMemories to it + (ds:"when you heard the news"))\
+### When you heard the news...
+Four weeks ago now, a little colder and a little darker. On a night just like this one except you didn't drive off the road and crash into a cactus, you got off work and drove the state highway in the dark and crossed over the edge of the res to Ocean's dad's trailer, and she told you that night while you were dead exhausted, "Knock, I'm pregnant."
+
+And all you could think was how totally not real it seemed, after an hour of blackness and New Mexican night streaming by, bugs exploding in tiny tragedies on your windshield, you just felt like driving on, like this thing was some podunk town you could breeze by, no services, ranch exit only. And you thought of every movie they ever made you watch in school and every lecture and every living example, the drunken uncles and snaggle-toothed coworkers who knocked up their high school sweethearts and started families on minimum wage and no prospects and never went anywhere and never did anything and what did you do? How could this happen? Why were you both so stupid?
+
+Ocean's aunt is paying for the baby but it's been made clear the money stops when the baby's born. Ocean wants to keep it, she's always wanted to be a mommy. But you never thought you'd be a daddy. And when she pushed this into your hand last night she told you, "Knock, it's time to decide. If you aren't with me on this, if you don't want this as much as I do, then this can't go on anymore and you should go. Fly. Head west. Find Nakaibito." She smiled just a little and traced your ear.
+
+"But decide soon, Knock. Decide soon."
+
+
+:: your shit job [memory] {"position":"450,225","size":"100,100"}
+(set: $broodedMemories to it + (ds:"your shit job"))\
+### Your shit job
+Juza straddles the 371 like a drunk at last call, smelly and without a plan for the future. Shiny cars whiz by at ninety once in a while, only stopping for gas or directions "("hint: not this way). No one ever stops for the stalls selling food and jewelry and blankets and cheap t-shirts that cluster around the dirt turn-off onto the rez. At least, no one buying anything.
+
+Big Jimmy shook his head when he heard you lived in Oro Oeste. Hell of a drive, kid, he said, popping up his Lumberjacks cap to scratch the straw pate underneath. You should get a place in Hoo-zuh. Little Jimmy'll set you up in that trailer cross the road for almost nothin'.
+
+Almost nothing. Yeah, exactly what you'd turn into on the cold day in hell you move to Juza. But on the other hand, that was before you met Ocean. Now the road back to Oro Oeste seems longer and longer every night
 
 
 :: StoryStylesheet [stylesheet]
