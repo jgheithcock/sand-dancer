@@ -17,7 +17,9 @@ The story headline is "A Desert Fable".
 Use no scoring.
 Use American dialect.  
  
-Include Conversation Framework for Sand-dancer by Aaron Reed. 
+[Include Conversation Framework for Sand-dancer by Aaron Reed. ]
+Include Conversation Framework by Eric Eve.
+Include Conversation Suggestions by Eric Eve.
 
 The story description is "It figures that your pickup would die on a night like this and leave you stranded in the dark New Mexico desert. But nothing else figures about this night, man. Nothing at all."
 The story genre is "Fiction".  
@@ -49,10 +51,14 @@ Before listing contents while taking inventory: group talents together.
 
 Before listing contents while taking inventory: group things required by a plan together. Before grouping together things required by a plan: say "useful stuff: ". 
 
-Include Default Messages by David Fisher. 
+[Include Default Messages by David Fisher.]
 
 To say bro: say "[one of]bro[or]man[or]dude[or]amigo[or]brohim[as decreasingly likely outcomes]".
 
+[The 'LibMsg' were using 'Default Messages' above. The current way is to change the response rule, e.g.]
+The parser error internal rule response (X) is "Say what?" ["I beg your pardon?"]
+[Many of these (such as the above, are handled by other extensions (and so an empty line is translated into "LOOK"]
+[
 When play begins:
 	set LibMsg <block swearing obscenely> to "Mos def, [bro].[/n]";
 	set LibMsg <empty line> to "Say what?[/n]";
@@ -73,7 +79,7 @@ When play begins:
 	set LibMsg <block throwing at> to "Hey, let's not just piss people off for no reason.[/n]";
 	set LibMsg <block sleeping> to "For whatever reason you've never felt more awake.[/n]";
 	set LibMsg <block waking up> to "Good call, [bro], but you can't seem to snap yourself out of whatever this is. Doesn't feel like a dream, anyway.[/n]"
-	
+]	
 Every turn when a dramatic scene is not happening and Coyote's Offer has not ended and a random chance of 1 in 40 succeeds: say "[one of]You shiver in the cold air[or]The cold night air swirls around you, and you pull your jacket closer[or]The air is frigid, and turns your breath into clouds[at random]."
 
 Before saying hello to when noun is not a spirit animal and noun is not voice: instead say "You can't really get into a good conversation right now."
@@ -82,14 +88,12 @@ Section - Undo Prevention
 
 [For the final release, we compromise and only prevent undo just after smoking.]
 
-Include Conditional Undo by Jesse McGrew.
+[Include Undo Output Control by Nathanael Nerode.]
 
-Carry out smoking: prevent undo.
-
-Rule for deciding whether to allow undo: if undo is prevented, say "Yeah, you wish you could unsmoke all the cigs you've inhaled. Life doesn't work like that." 
-		
-
-
+[Before undoing an action:
+	say "Yeah, you wish you could unsmoke all the cigs you've inhaled. Life doesn't work like that.";
+	rule fails.
+]
 
 Chapter - Beginning the Story
 
@@ -522,7 +526,7 @@ Instead of consulting the guidebook about "hare/rabbit": say "You look up the ha
 
 Instead of consulting the guidebook about "coyote": say "Weird, it looks like somebody's ripped out the page."
 
-[Exercise 11.4]Understand "guide/book/page/pages" as the guidebook. Understand the command "read about" as "consult".
+[Exercise 11.4]Understand "guide/book/page/pages" as the guidebook. Understand "read about [something]" as consulting it about.
 
 [Exercise 3.1]Some scattered newspapers are in Weed-strewn Rust. A withered cactus is fixed in place in Backtracking. 
 
@@ -543,7 +547,7 @@ Section - Radio
 
 An emergency radio is a fixed in place device in Break Room. 
 
-A frequency is a kind of value. 100.9kHz specifies a frequency. 100.9 kHz specifies a frequency. 100.9 specifies a frequency with parts integer and decimal.
+A frequency is a kind of value. 100.9kHz specifies a frequency. 100.9 kHz specifies a frequency. 
 
 The radio has a frequency called the frequency tuned to. The frequency tuned to of the radio is 77.2kHz. The radio has a frequency called the maximum frequency. The maximum frequency of the radio is 109.9kHz. The radio has a frequency called the minimum frequency. The minimum frequency of the radio is 67.0kHz.
 
@@ -551,7 +555,7 @@ The description of the emergency radio is "Vintage, man. A chrome switch on the 
 
 Tuning it to is an action applying to one thing and one frequency. Understand "tune [thing] to [frequency]" as tuning it to.  Understand "turn [thing] to [frequency]" as tuning it to.
 
-Understand "tune [thing] to [number]" as coarse tuning. Coarse tuning is an action applying to one thing and one number. Carry out coarse tuning: try tuning the noun to the frequency with integer part number understood decimal part 0. [This is necessary to understand a command like TUNE RADIO TO 100. Inform recognizes 100 as a number, not a frequency, which means we need a whole different action to understand.]
+Understand "tune [thing] to [number]" as coarse tuning. Coarse tuning is an action applying to one thing and one number. Carry out coarse tuning: try tuning the noun to the frequency understood. [This is necessary to understand a command like TUNE RADIO TO 100. Inform recognizes 100 as a number, not a frequency, which means we need a whole different action to understand.]
 
 Understand the command "set" as something new. Understand the command "set" as "tune". 
 
@@ -891,7 +895,7 @@ Every turn when radio is switched on and frequency tuned to of radio is emergenc
 	move voice to location;
 	try quizzing voice about introduction;
 	try listing suggested topics;
-	have the parser notice voice.
+	set pronouns from voice. [have the parser notice voice.][Now, 'tell it/him' will refer to the voice]
 	
 After quizzing voice about introduction: say "Not like you think anything's going to happen, but what the hell. You grab the dusty old mike, press the call button, and ask is there anybody[paragraph break]'...out there?' the speaker blurts and holy crap, someone's responding, and they say 'Roger roger, tower station nineteen, read you now loud and clear, what's your forty?' and the voice is staticky and whirled through with weird rhythmic distortions but you can hear it just fine and now what?[add what that means ask suggestion][add being lost tell suggestion][add never mind tell suggestion]".
 
@@ -987,7 +991,7 @@ To say sinister-radio-3:
 		say "'You think just because you've got [a random talent held by player] now you're going to be anything other than a pathetic failure?' the radio squawks angrily[radio left off], before dissolving into harsh buzzing distortions";
 	otherwise if final-threatened is false and the player holds a talent:
 		now final-threatened is true;
-		say "'You're nothing,' the radio spews, 'your [list of talents held by player] [is-are] worthless. You'll never amount to anything, and neither will your kid, just another half-breed loser destined to die in poverty and live in debt, isn't that right, Knock?' and with a sudden shock you realize why the voice sounds so familiar. It's your voice. It's your own god-damned voice";
+		say "'You're nothing,' the radio spews, 'your [list of talents held by player] [are] worthless. You'll never amount to anything, and neither will your kid, just another half-breed loser destined to die in poverty and live in debt, isn't that right, Knock?' and with a sudden shock you realize why the voice sounds so familiar. It's your voice. It's your own god-damned voice";
 	otherwise:
 		say "[one of]The radio fizzles and growls through weird twists of distortion[or]Angry distortion bubbles and pops from the radio speaker, twisting in weird rhythmic patterns[stopping]".
 		
@@ -1100,7 +1104,7 @@ At the time when Rabbit's conversation starts: try quizzing the rabbit about int
 
 Burrow is a room. The description of Burrow is "Roots push through the earthen roof, casting weird shadows in the beam of your flashlight. It's round and small and underground in here and filled with hot sweat and animal stench. But mostly filled with something big and alive." Some roots are scenery in Burrow.
 
-The rabbit is in Burrow. The initial appearance of the rabbit is "[one of]It's huge, covered in sweaty fur stained with mud, and a huge eye stares out you above long black whiskers. You can feel its breath on your face and its heartbeat thudding through the floor and you cringe back in terror against the wall. It's... well.[paragraph break]It's a rabbit.[or]The rabbit stares at you, whispers twitching, and it's freaking you out.[stopping]". The description of the rabbit is "The closer you look the weirder it gets, like it doesn't start or end in any one place or something all new-agey like that."
+The rabbit is in Burrow. The initial appearance of the rabbit is "[one of]It's huge, covered in sweaty fur stained with mud, and a huge eye stares out you above long black whiskers. You can feel its breath on your face and its heartbeat thudding through the floor and you cringe back in terror against the wall. It's... well.[paragraph break]It's a rabbit.[or]The rabbit stares at you, whiskers twitching, and it's freaking you out.[stopping]". The description of the rabbit is "The closer you look the weirder it gets, like it doesn't start or end in any one place or something all new-agey like that."
 
 introduction is a familiar thing. After quizzing the rabbit about introduction: say "The rabbit breathes and stares. You wonder if it's going to start talking like in some crap disney movie and then jesus christ it does...[paragraph break]'So what'd you expect from an animal guardian?' it says, but like not with its lips, somewhere in your head instead. 'Were you thinking big, nasty, sharp, pointy teeth? Waistcoat and pocket watch? Nah. Tricks are for kids. What's up, Knock?' Its whiskers twitch.[add rabbit ask suggestion][add go insane other suggestion]".
 
@@ -1410,4 +1414,94 @@ Report trading when Sand-dancer is visible: clear all topics; say "'The choice i
 
 
 
+Volume - Modifications for Sand-dancer
 
+[Below, we make the changes to produce our customized system for Sand-dancer.]
+
+Section - Redirect yes and no to informing
+
+[To simplify the number of different concepts that must be explained, we redirect saying yes and saying no to informing about the topics created for yes and no by Eric's extension. This way we do not need to introduce the saying yes and saying no actions in the book, or remember that the syntax for matching them would differ from matching other topics.]
+
+Instead of saying yes, try informing the current interlocutor about yes-suggestion. 
+Instead of saying no, try informing the current interlocutor about no-suggestion. 
+
+Section - Prevent leaving conversation early
+
+[Since Sand-dancer's conversations are tightly scripted events, we disallow player movement while one is underway.]
+
+Can't leave conversation early is a truth state that varies. Can't leave conversation early is usually true.
+
+Saying goodbye to someone is finishing conversation. Going is finishing conversation.
+Instead of finishing conversation when current interlocutor is a person and can't leave conversation early is true (this is the Conversation Framework for Sand-dancer can't normally leave conversation rule): say "You have a feeling this conversation isn’t over."
+
+Section - Show topics after every turn in conversation
+
+[We want the topics list to be displayed after every turn, not just when requested.]
+
+Show topics every turn is a truth state that varies. Show topics every turn is true.
+
+Every turn when current interlocutor is a person and show topics every turn is true (this is the Conversation Framework for Sand-dancer show topics after every turn rule): try listing suggested topics.
+
+
+Section - Extend the grammar line
+
+[The freeform nature of our topic titles sometimes implies additional syntaxes not supported by the default extension.]
+
+Understand "ask [any known thing]" or "ask him [any known thing]" or "ask her [any known thing]" as implicit-quizzing.
+Understand "tell [any known thing]" or "tell him [any known thing]" or "tell her [any known thing]" as implicit-informing.
+
+Section - Clear all topics
+
+[We often want to remove all currently available topics, to move the conversation on to a new subject. Here's a shortcut phrase.]
+
+To clear all topics:
+	truncate ask-suggestions of current interlocutor to 0 entries;
+	truncate tell-suggestions of current interlocutor to 0 entries;
+	truncate other-suggestions of current interlocutor to 0 entries.
+
+Section - Scope
+
+[Eric's extension requires manually setting topics as familiar or unfamiliar. Since our topics are matched to individual characters (who never have visible inventory), we simplify this by having a character hold all the topics he can say, and making all held topics familiar when a conversation begins. ]
+
+Carry out saying hello to a person (called the conversant) (this is the Conversation Framework for Sand-dancer make held things familiar on hello rule):
+	now every thing held by the conversant is familiar.
+	
+Carry out saying goodbye to a person (called the conversant) (this is the Conversation Framework for Sand-dancer make held things unfamiliar on goodbye rule):
+	now every thing held by the conversant is unfamiliar.
+
+Section - Remove conversation topics after discussion
+
+[Eric's topics are by default repeatable; ours are not.]
+
+First after informing somebody about something (called the thread) (this is the Conversation Framework for Sand-dancer auto remove tell suggestions rule):
+	say "[remove thread tell suggestion][run paragraph on]";
+	continue the action.
+
+First after quizzing somebody about something (called the thread) (this is the Conversation Framework for Sand-dancer auto remove ask suggestions rule):
+	say "[remove thread ask suggestion][run paragraph on]";
+	continue the action.
+
+Section - Italicized Topics List
+
+[We style the topics list to make it stand out more from the surrounding text.]
+
+Before listing suggested topics (this is the Conversation Framework for Sand-dancer italicize listed topics rule): say "[italic type][run paragraph on]". After listing suggested topics (this is the Conversation Framework for Sand-dancer end italicize listed topics rule): say "[roman type][run paragraph on]".
+
+Section - Can't talk to yourself
+
+[We fix what's arguably a bug in the original extension.]
+
+Instead of saying hello to yourself (this is the Conversation Framework for Sand-dancer can't say hello to yourself rule): say "You know you're crazy when you start talking to yourself.". 
+
+Instead of hailing (this is the Conversation Framework for Sand-dancer ignore hailing rule): do nothing.
+
+
+Volume - Testing (not for release)
+
+Test start with "x me. i. / think about stories / x photo / open wallet. x license. x receipt. / think about shit job / x jade. take it. / x saguaro. x lizard. / open box. x pack. take it. / x truck. out. / x truck. / n"
+
+Test flashlight with "test start / throw jade at window / in / take jade / light lighter / touch desk. open drawer / take flashlight / turn flashlight on"
+
+Test office with "test flashlight / n. take key. think about ocean. x poster / s"
+
+Test radio with "test office / e / x radio / turn it on / n / x panel / turn on lights/ s / turn radio on / tune it to 102.3kHz"
