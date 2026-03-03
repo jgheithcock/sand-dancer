@@ -94,6 +94,9 @@ Your baby too.
   ]
   (out-data: $visitItems's _item is 1)
 ]))\
+(set: $afterwards to (macro: str-type _item, [
+  (out-data: $visitItems's _item > 1)
+]))
 <!-- Set up -->\
 ($addToInventory: 'a lighter')\
 ($addToInventory: 'a denim jacket')\
@@ -102,6 +105,7 @@ Your baby too.
 ($addToInventory: 'emotional baggage')\
 ($moveToLoc: 'grandma\'s stories', 'emotional baggage')\
 (set: $broodedMemories to (ds:))\
+(set: $talents to (ds:))\
 <!-- Lighting -->\
 (set: $emergencyLightsOn to false)\
 (set: $flashlightOn to false)\
@@ -154,7 +158,7 @@ The little sand-dancer lizard stares at you with one slitted eye]
 Not much to say, a bit thread-bare, but all you have to protect you from the cold.
 
 
-:: a desk [fixed-in-place] {"position":"875,400","size":"100,100"}
+:: a desk [fixed-in-place] {"position":"475,475","size":"100,100"}
 ($first:'metal-desk')[($moveToLoc:'a flashlight','a desk')\
 ($clearItemHistory:)]\
 ## Metal Desk
@@ -167,7 +171,7 @@ You slide the drawer open by feel in the darkness. (if:($itemLoc:'a flashlight')
 When the highway patrol pulls you over they see your kind of crazy uncombed hair (morning), your brown name (Nakaibito Morales) and brown skin (actually more kinda tan), your D.O.B. (eighteen years ago just barely) and tribal affiliation card (expired) and assume you're either some kind of native eco-terrorist, illegal drug-running border jumper, or delinquent high school dropout (all lies except for kinda maybe the last one a little). Unless it's Jimmy Kay who pulled you over since he usually just wants to buy you a beer and talk about your dad, which is weird but better than getting a ticket.
 
 
-:: a flashlight {"position":"875,525","size":"100,100"}
+:: a flashlight {"position":"350,475","size":"100,100"}
 ## Flashlight
 ($first:'a flashlight')[($addToInventory:'a flashlight')Yeah, it's a flashlight all right. You grip it in sudden relief, turning it in your hands till your finger finds the switch.]
 
@@ -212,6 +216,14 @@ Something about the ultrasound of Ocean's baby makes you want to brood about ($i
 ($contentsOf:'a glove box')
 
 
+:: a hole [fixed-in-place] {"position":"225,475","size":"100,100"}
+($first:'a hole')[($moveToLoc:'a roll of duct tape','a hole')]\
+## A hole in the floor
+(if: ($itemLoc:'a roll of duct tape') is 'a hole')[\
+Past the many cobwebs, you make out ($itemLink:'a roll of duct tape').\
+](else:)[Just an empty hole.]
+
+
 :: a lighter {"position":"200,975","size":"100,100"}
 ### Your lighter
 A classic Zippo. You flick it open a few times.
@@ -244,6 +256,27 @@ Grandma said it will bring you luck, which hasn't really been working out. You c
 Something about the receipt from Big Jimmy's makes you want to brood about ($itemLink:'your shit job').
 
 
+:: a roll of duct tape [fixed-in-place] {"position":"225,600","size":"100,100"}
+(if: ($itemLoc:'a roll of duct tape') is 'a hole')[\
+  (if: $talents contains 'courage')[\
+    You reach down into the hole, brushing the cobwebs away impatiently, and pull out the duct tape. Taken.($addToInventory:'a roll of duct tape')($clearItemHistory:)\
+  ](else:)[\
+    ($first: 'a roll of duct tape')[You reach your hand towards the hole, then pull back with a start as you brush cobwebs. Nightmare visions of fat black spiders shudder through your brain. No way are you reaching in there.]\
+    ($afterwards: 'a roll of duct tape')[Yeah, sorry, but you're not putting your hand in there.]\
+  ]\
+](else:)[\
+## A roll of duct tape
+Hey, that roll of duct tape might be useful if you decide on fixing your truck and getting out of here.]
+
+
+:: a rusted key {"position":"875,350","size":"100,100"}
+($first: "a rusted key")[\
+($moveToLoc: 'meeting Ocean', 'emotional baggage')\
+(set: $goToOnDone to 'foreman\'s office')]\
+### A rusted key
+Something about the rusted key makes you want to brood about ($itemLink:'meeting Ocean').
+
+
 :: a rusty tin can {"position":"450,850","size":"100,100"}
 ### A rusty tin can
 Someone left a tin can here years ago: ridged ripples run down its rusty side
@@ -273,7 +306,56 @@ Most of the pages are faded or worn away, but flipping through, it looks like a 
 (_listOfAnimals:)
 
 
-:: base of tower {"position":"525,350","size":"100,100"}
+:: a wire mesh cage [fixed-in-place] {"position":"775,600","size":"100,100"}
+(set: $goToOnDone to 'break room')\
+## Wire mesh cage
+
+Bolted to the wall, it looks like one of those 'break-in-case-of-emergency' things. You can see a (link-reveal:'blanket')[(hide: ?take-blanket)(show: ?take-blanket)] in it.
+|take-blanket)[\
+(if: $talents contains 'strength')[You grip the mesh in one hand and pull, and realize it's so rusted you can easily peel it back. The door rips free and you drop it to the floor. The ($itemLinkAlias:'blanket', 'emergency blanket') is yours.\
+($addToInventory:'emergency blanket')\
+($removeFromGame: 'a wire mesh cage')\
+($clearItemHistory:)\
+]\
+(else-if: ($inventory:) contains 'a rusted key')[The cage seems to be locked but you remember the rusted key you found.
+You sling the key into the lock, but as you turn it, the rusted metal snaps off inside. The crumbling fragments fall to the ground as you slam your fist against the wire mesh in frustration. This is not your day.($removeFromGame: 'a rusted key')\
+]\
+(else:)[\
+The cage seems to be locked.\
+]\
+]
+
+
+:: an emergency radio [fixed-in-place] {"position":"875,475","size":"100,100"}
+($first:'emergency-radio')[\
+(set:$radioIsOn to false)\
+(set:$currentFrequency to 77.2)\
+]\
+(set:_updateRadio to (macro:[\
+  (if: $radioIsOn)[(show: ?radio-on)(hide: ?radio-off)]\
+  (else:)[(show: ?radio-off)(hide: ?radio-on)]\
+  (out-data:'')
+]))\
+## Emergency Radio
+Vintage, man. A chrome switch on the side to turn it on and off, and a big fifties dial on the front. It looks like it's \
+(link-rerun:('tuned to'))[\
+(set: $currentFrequency to (prompt: [Tune to what frequency?], (str:$currentFrequency)))\
+(set: $currentFrequency to ($toNum: $currentFrequency, 67.0, 109.9))\
+(replace:?current-frequency)[$currentFrequency]] \
+|current-frequency>[$currentFrequency]kHz right now.
+
+The emergency radio is currently switched \
+|radio-on)[(link-rerun:'on')[(set: $radioIsOn to false)(_updateRadio:)]]\
+|radio-off>[(link-rerun:'off')[\
+(if: $emergencyLightsOn)[(set: $radioIsOn to true)\
+](else:)[(show: ?no-power)](_updateRadio:)]].\
+(_updateRadio:)
+
+|no-power)[You flip the switch back and forth, but there doesn't seem to be any power. Damn.]
+
+
+
+:: base of tower {"position":"500,350","size":"100,100"}
 (if: visits is 1)[\
 ($addToHere:'a rusty tin can')\
 ]\
@@ -282,7 +364,17 @@ Behind the concrete building, featureless except for a dust-covered window, a st
 ($youCanAlsoSee:)
 
 
-:: break the window [fixed-in-place] {"position":"750,475","size":"100,100"}
+:: break room {"position":"750,475","size":"100,100"}
+($first:'break room')[\
+($moveToLoc:'an emergency radio', 'break room')\
+($moveToLoc:'a wire mesh cage', 'break room')\
+]\
+## Break Room
+Shadows and grime linger in dark corners of this dismal room with just one tiny frosted window. Some rotting picnic tables strewn with layers of sand and crumbling trash are pushed against one wall, and open doorways lead [[west->staging area]] and [[north->storage room]].
+($youCanAlsoSee:)
+
+
+:: break the window [fixed-in-place] {"position":"400,600","size":"100,100"}
 (set:_itemsToTry to (macro:[
   (set:_heavyLink to (macro:str-type _item, [
     (out:)[\
@@ -326,10 +418,15 @@ sparkles faintly in the beam of your headlights. \
 |brokenWindow)[The empty frame of a window [[leads inside->staging area]].]\
 |unbrokenWindow>[You push your face against the dusty glass window but it is too dark to see inside.(show:?suggest-break)]\
 ]
-Tendrils of desert sand drift against a ($linkRevealPersist: 'boarded-up door to the northeast',[(set:$triedDoor to true)(hide: ?untriedDoor)(show: ?triedDoor)])(t8n:"dissolve")[ leading inside; you could also ]<untriedDoor|(t8n:"dissolve")[. You shove against the door with all your weight. The door won't budge. You slam your hands against the boards in frustration. I guess you could ](triedDoor|[[walk around to the east->weed strewn rust]] or [[head south->outside your truck]] back to your truck.[(t8n:'fade')+(transition-time:.5s)+(transition-delay:1s)[ Or, you could try to ($itemLink:'break the window.')]](suggest-break|
+Tendrils of desert sand drift against a ($linkRevealPersist: 'boarded-up door to the northeast',[(set:$triedDoor to true)(hide: ?untriedDoor)(show: ?triedDoor)])(t8n:"dissolve")[ leading inside; you could also ]<untriedDoor|(t8n:"dissolve")[. You shove against the door with all your weight. The door won't budge. You slam your hands against the boards in frustration. I guess you could ](triedDoor|[[walk around to the east->weed strewn rust]] or [[head south->outside your truck]] back to your truck.[(t8n:'fade')+(transition-time:.5s)+(transition-delay:1s)[ Or, you could try to ($itemLink:'break the window').]](suggest-break|
 (if:$triedDoor is true)[(hide: ?untriedDoor)(show: ?triedDoor)]\
 (if:$windowExamined is true)[(show: ?examine-window)]\
 (if:$windowBroken is true)[(show: ?brokenWindow)(hide: ?unbrokenWindow)(hide: ?suggest-break)](else:)[(hide: ?brokenWindow)(show:?unbrokenWindow)]
+
+
+:: emergency blanket [fixed-in-place] {"position":"900,600","size":"100,100"}
+## Emergency blanket
+Hey, that emergency blanket might be useful if you decide on spending the night here.
 
 
 :: emotional baggage [fixed-in-place] {"position":"200,225","size":"100,100"}
@@ -392,6 +489,23 @@ You are pretty sure there is plenty of other stuff burried in that bag, but you 
 ]))
 
 
+:: foreman's office {"position":"625,350","size":"100,100"}
+($first:'foreman\'s office')[(set: $emergencyFreq to 102.3)]\
+(set: _litBy to ($locationIsLit:))\
+## Foreman's Office
+(if: _litBy is 'by flashlight')[\
+You sweep the beam of your flashlight around \
+](else:)[\
+The stark emergency lights illume \
+] this tiny office, probably once where the boss sat under a dust-covered window. The only exit is to [[the south->staging area]].
+
+Tacked to the wall is a peeling (link-show:'safety poster',?read-frequency), text almost faded away except for a section mentioning an emergency radio frequency. \
+|read-frequency)[\
+According to the poster, the emergency radio frequency is [$emergencyFreq]kHz.]
+
+A half-collapsed desk is in the middle of the room(if: ($itemLoc:'a rusted key') is 'offstage')[, on it is ($itemLink:'a rusted key')].
+
+
 :: grandma's stories [memory] {"position":"325,225","size":"100,100"}
 (set: $broodedMemories to it + (ds:"grandma's stories"))\
 ### Grandma's stories
@@ -404,10 +518,8 @@ Mom would yell at Grandma a lot for filling your head with that new-age bullshit
 (set: _style to (dm:
   'width', '25vw',
   'min-width', '12em',
-  'background', '#000',
   'background-color', 'rgba(241, 233, 210, .95)',
-  'border', '1px solid #fff',
-  'border-color', '#211100',
+  'border', '1px solid #211100',
   'border-radius', '0 16px 16px 0',
   'color', '#211100',
   'box-shadow', '.1em 1em 2em .2em rgba(0,0,0,.2)'
@@ -565,6 +677,17 @@ Mom would yell at Grandma a lot for filling your head with that new-age bullshit
 You look up the brown-colored lizard in the guidebook and quickly identify it: those eyes are a dead giveaway. The entry says it's a 'rare subspecies of the common desert lizard found only in the deep desert near Oro Oeste, and known to native peoples as a //sand-dancer//. In legends, the sand-dancer was a clever trickster and twister of words, who created night by tricking the sun into spending half the day underground.'
 
 Huh.
+
+
+:: meeting Ocean [memory] {"position":"825,225","size":"100,100"}
+## Meeting Ocean
+She was buying a Fresca at Big Jimmy's when you got off your shift, shoving work keys in your pocket, and you stood behind her waiting to get some cigs, almost too tired to notice how cute she was but still noticing, yeah, still noticing.
+
+She turned around and caught you noticing and you were pretty embarrassed and covered in sweat and grease from the garage, so you stepped up and bought some Camels and were pretty surprised she was still there when you turned around.
+
+She told you her name was Ocean Running Deer and she lived on the rez and you told her your name was Nakaibito Morales and you lived in Oro Oeste. She said isn't Nakaibito the name of a town way off west and you told her your mom had picked it off a map because it sounded like a good Indian name. You never tell anyone that story but for some reason you told her. She laughed, sweetly though, and said maybe the two of you should go there sometime and see what it was like. Somehow two weeks later you were dating although you never ended up going to Nakaibito.
+
+And now... no, you can't think about that yet.
 
 
 :: middle of nowhere [Tower-Vicinity] {"position":"400,725","size":"100,100"}
@@ -739,8 +862,17 @@ You flick it open and shut a few times, an old habit.]
     (out-data:"you could start by getting out of this truck")
   ](else-if: (not (visited:'crumbling concrete')))[
     (out-data:"you could start by looking around the area, seeing if maybe there's a phone or something")
+  ](else-if: ($windowBroken is not true))[
+    (out-data:"you could break open a window to get inside that building")
+  ](else-if:$flashlightOn is not true)[
+    (out-data:"you could try exploring the building by feel, even though it's so dark")
+  ](else-if: not (visited:'storage room'))[
+    (out-data:"you should poke around the building more, see what else there is to find")
+  ](else-if: not $emergencyLightsOn)[
+    (out-data:"you should switch on those emergency lights in the storage room so you can get a better look at things")
+  ](else:)[
+    (out-data:"you could... man, I don't know...")
   ]
-  (out-data:"you could... man, I don't know...")
 ]))\
 ### Smoke...
 (unless: ($inventory:) contains 'a lighter')[\
@@ -770,11 +902,29 @@ Faint shafts of light from your dimming headlights seep through the empty window
 ($first:'staging area')[Your surroundings spring into brightness around you.
 ]\
 ## Staging Area
-It's obvious this place has been abandoned for years. Cold night air breathes through holes in the roof and everything is strewn with desert sand and patches of mold. The (link-show:'boarded-up door', ?push-it) is alongside the (link-goto: 'empty window frame', 'crumbling concrete').|push-it)[ You push against it, but the door won't budge.] Other rooms lie north and east. In one corner is the metal desk.
+It's obvious this place has been abandoned for years. Cold night air breathes through holes in the roof and everything is strewn with desert sand and patches of mold. The (link-show:'boarded-up door', ?push-it) is alongside the (link-goto: 'empty window frame', 'crumbling concrete').|push-it)[ You push against it, but the door won't budge.] Other rooms lie [[north->foreman's office]] and [[east->break room]]. In one corner is the metal desk.
 
-The floor has half-collapsed near one corner, revealing a hole criss-crossed with cobwebs.
+The floor has half-collapsed near one corner, revealing ($itemLink:'a hole') criss-crossed with cobwebs.
 ($youCanAlsoSee:)
 ]
+
+
+:: storage room {"position":"750,350","size":"100,100"}
+## Storage Room
+
+
+:: test {"position":"200,350","size":"100,100"}
+($addToInventory: 'a pack of cigarettes')\
+($addToInventory: 'a piece of jade')\
+(set: $windowExamined to true)\
+(set: $windowBroken to true)\
+($addToInventory: 'a flashlight')\
+(set: $flashlightOn to true)\
+[[Staging Area->staging area]]
+($itemLink:'a hole')
+(set: $talents to it + (ds:'scent', 'courage', 'xstrength'))\
+[[Foreman's Office->foreman's office]]
+[[break room]]
 
 
 :: the last day of high school [memory] {"position":"700,225","size":"100,100"}
@@ -834,6 +984,20 @@ tw-story {
     background-color: #F1E9D2;
     color: #211100;
   	font-family: 'Crimson Text', Garamond, serif;
+}
+tw-dialog {
+    background-color: #F1E9D2;
+    color: #211100;
+  	font-family: 'Crimson Text', Garamond, serif;
+    border: 1px solid #211100;
+    border-radius: 16px;
+    box-shadow: .1em 1em 2em .2em rgba(0,0,0,.2);
+}
+tw-backdrop {
+  background-color: rgba(241, 233, 210, .9);
+}
+tw-dialog input[type=text] {
+    border: 1px solid;
 }
 
 tw-link, .visited, .enchantment-link {
