@@ -129,6 +129,8 @@ You don't know what's going to happen now.
 ($moveToLoc: 'grandma\'s stories', 'emotional baggage')\
 (set: $broodedMemories to (ds:))\
 (set: $talents to (ds:))\
+(set: $emergencyFrequency to 102.3)\
+(set: $currentFrequency to 77.2)\
 <!-- Lighting -->\
 (set: $emergencyLightsOn to false)\
 (set: $flashlightOn to false)\
@@ -367,12 +369,33 @@ The cage seems to be locked.\
 
 :: an emergency radio [fixed-in-place] {"position":"875,575","size":"100,100"}
 ($first:'emergency-radio')[\
-(set:$radioIsOn to false)\
-(set:$currentFrequency to 77.2)\
+  (set:$radioIsOn to false)\
 ]\
-(set:_updateRadio to (macro:[\
-  (if: $radioIsOn)[(show: ?radio-on)(hide: ?radio-off)]\
-  (else:)[(show: ?radio-off)(hide: ?radio-on)]\
+(set:_updateRadio to (macro:[
+  (if: $radioIsOn)[(show: ?radio-on)(hide: ?radio-off)]
+  (else:)[(show: ?radio-off)(hide: ?radio-on)]
+  (out-data:'')
+]))\
+(set: _updateMessage to (macro: str-type _action,[
+  (hide: ?no-power)
+  (hide: ?tune-while-off)
+  (hide: ?turn-on-untuned)
+  (hide: ?turn-on-tuned)
+  (hide: ?tune-to-emergency)
+  (hide: ?tune-to-static)
+  (hide: ?try-mike)
+  (hide: ?no-one-there)
+  (if: _action is 'tune')[
+    (if: not $radioIsOn)[(show:?tune-while-off)]
+    (else-if: $currentFrequency is $emergencyFrequency)[(show:?tune-to-emergency)(show:?link-mike)]
+    (else:)[(show:?tune-to-static)]
+  ](else-if: _action is 'on')[
+    (if: not $emergencyLightsOn)[(show:?no-power)]
+    (else-if:$currentFrequency is $emergencyFrequency)[(show:?turn-on-tuned)(show:?link-mike)]
+    (else:)[(show:?turn-on-untuned)]
+  ](else:)[
+    
+  ]
   (out-data:'')
 ]))\
 ## Emergency Radio
@@ -380,18 +403,58 @@ Vintage, man. A chrome switch on the side to turn it on and off, and a big fifti
 (link-rerun:('tuned to'))[\
 (set: $currentFrequency to (prompt: [Tune to what frequency?], (str:$currentFrequency)))\
 (set: $currentFrequency to ($toNum: $currentFrequency, 67.0, 109.9))\
+(_updateMessage:'tune')\
 (replace:?current-frequency)[$currentFrequency]] \
 |current-frequency>[$currentFrequency]kHz right now.
 
 The emergency radio is currently switched \
-|radio-on)[(link-rerun:'on')[(set: $radioIsOn to false)(_updateRadio:)]]\
-|radio-off>[(link-rerun:'off')[\
-(if: $emergencyLightsOn)[(set: $radioIsOn to true)\
-](else:)[(show: ?no-power)](_updateRadio:)]].\
+|radio-on)[(link-rerun:'on')[(set: $radioIsOn to false)(_updateRadio:)(_updateMessage:'off')]]\
+|radio-off>[(link-rerun:'off')[(if: $emergencyLightsOn)[(set: $radioIsOn to true)](_updateRadio:)(_updateMessage:'on')]].\
 (_updateRadio:)
 
-|no-power)[You flip the switch back and forth, but there doesn't seem to be any power. Damn.]
+|no-power)[You flip the switch back and forth, but there doesn't seem to be any power. Damn.
+]\
+|turn-on-untuned)[You flip a bulky switch on the radio's side. A hiss of static pours from the speakers, like tons of sand sliding over metal.
+]\
+|turn-on-tuned)[You flip a bulky switch on the radio's side. A hiss of static pours from the speakers, like tons of sand sliding over metal, then quickly resolves into nothing more than a quiet hum.
 
+|link-mike>[(link-repeat:"Try the mike")[(if:$conversationOver is true)[(show:?no-one-there)](else:)[(show:?try-mike)(hide:?link-mike)]
+]]\
+]\
+|tune-while-off)[You tuned the radio but there is not much point when it is not turned on.
+]\
+|tune-to-emergency)[You tune the radio to |current-frequency>[$currentFrequency]kHz, and the static resolves into a clear signal.
+
+|link-mike>[(link-repeat:"Try the mike")[(if:$conversationOver is true)[(show:?no-one-there)](else:)[(show:?try-mike)(hide:?link-mike)]
+]]\
+]\
+|tune-to-static)[
+You tune the radio to |current-frequency>[$currentFrequency]kHz, and the radio warbles wildly before dissolving into static.
+]\
+|try-mike)[Not like you think anything's going to happen, but what the hell. You grab the dusty old mike, press the call button, and ask is there anybody
+
+"...out there?" the speaker blurts and holy crap, someone's responding, and they say "Roger roger, tower station nineteen, read you now loud and clear, what's your forty?" and the voice is staticky and whirled through with weird rhythmic distortions but you can hear it just fine and now what?
+
+|what-forty>[(link:"What does 'forty' mean?")[(show:?forty)(hide:?what-forty)] | ]\
+|forty)[You try to make some joke about not having forty of anything, but the voice cuts you off. 'Ten forty means situation report, son. Obviously you're not on duty. Ain't nobody on duty out there anymore, specially not this time of night. What's going on?'
+]\
+|tell-about-being-lost>[(link:"Tell him about being lost")[(show:?lost)(hide:?what-forty)(hide:?tell-about-being-lost)]]
+
+|lost)[Feeling a little stupid, you come clean and tell the voice that you drove off the road and aren't sure really exactly where you are.
+
+'Copy that,' the voice says briskly after a moment. 'You're at tower station nineteen, son, about thirty-two miles southwest of Oro Oeste, fifteen miles or so from the state highway.' And if the mike wasn't attached to the radio you'd drop it on the floor. Fifteen miles? How in the //hell// could you have driven fifteen miles off the road and not remember? How is that even possible?
+
+'Hello?' the radio says. 'Hello, son, do you copy?
+
+(link:'Yeah, you copy')[(show:?voice-explains)]\
+]\
+|voice-explains)[You jabber something positive and sit back, still shaken.
+
+"Look, son," the voice says, "I don't know how you got out there but that's not important right now. Weather report's coming in and there's a cold front the size of Texas coming your way. I don't want to scare you but if you don't find a way home, or figure out some food and shelter for the night, you could freeze to death. You hear me? Now on account of the cutbacks I don't have anyone to send out there until morning. But there may be parts around that old tower you can use to patch up your truck and make it back to the highway. Or, there may be emergency supplies that would get you through the night. This storm's gonna blow out all our communication, so you're gonna be on your own. It's up to you. Over and out."
+
+You rub your face tiredly. Ocean was expecting you tonight after your shift, like usual. If you don't make it she'll be worried sick. Then on the other hand maybe you should worry about yourself first for a change. You feel like you need a cigarette and then you remember you quit. Hell, can't anything be easy?(set:$conversationOver to true)]\
+]\
+|no-one-there)[(hide:?link-mike)Whoever you were talking to must be off the air, you only hear the static from the radio.]
 
 
 :: base of tower [Around-the-Tower Tower-Vicinity] {"position":"500,450","size":"100,100"}
@@ -543,7 +606,6 @@ You are pretty sure there is plenty of other stuff burried in that bag, but you 
 
 
 :: foreman's office [Tower-Vicinity Office-Interior] {"position":"625,450","size":"100,100"}
-($first:'foreman\'s office')[(set: $emergencyFreq to 102.3)]\
 (set: _litBy to ($locationIsLit:))\
 ## Foreman's Office
 (if: _litBy is 'by flashlight')[\
@@ -554,7 +616,7 @@ The stark emergency lights illume \
 
 Tacked to the wall is a peeling (link-show:'safety poster',?read-frequency), text almost faded away except for a section mentioning an emergency radio frequency. \
 |read-frequency)[\
-According to the poster, the emergency radio frequency is [$emergencyFreq]kHz.]
+According to the poster, the emergency radio frequency is [$emergencyFrequency]kHz.]
 
 A half-collapsed desk is in the middle of the room(if: ($itemLoc:'a rusted key') is 'offstage')[, on it is ($itemLink:'a rusted key')].
 
@@ -1050,8 +1112,7 @@ Near some rows of crumbling shelving supporting hundreds of dusty \
 |emergency-lights)[\
 (set: $emergencyLightsOn to true)\
 ($first:'emergency-lights')\
-[
-With a sharp buzz, a whiff of static and an electrical groan, bare light bulbs flicker on throughout the building.
+[With a sharp buzz, a whiff of static and an electrical groan, bare light bulbs flicker on throughout the building.
 ]]\
 ($youCanAlsoSee:)
 
@@ -1071,7 +1132,11 @@ With a sharp buzz, a whiff of static and an electrical groan, bare light bulbs f
 [[roof]]
 ($itemLink:"bunny's bow tie")
 ($itemLink:"sage")
-
+(link:"Test Radio")[\
+(set: $emergencyLightsOn to true)\
+(set: $currentFrequency to $emergencyFrequency)\
+(go-to:'break room')\
+]
 
 
 :: the last day of high school [memory] {"position":"700,325","size":"100,100"}
