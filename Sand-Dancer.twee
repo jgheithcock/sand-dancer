@@ -16,15 +16,43 @@ Sand-Dancer
     "item": "yellow",
     "memory": "purple",
     "fixed-in-place": "purple",
-    "Tower-Vicinity": "red"
+    "Tower-Vicinity": "red",
+    "Office-Interior": "orange",
+    "Around-the-Tower": "green"
   },
   "zoom": 1
 }
 
 
+:: Control Center [Office-Interior Tower-Vicinity] {"position":"1000,350","size":"100,100"}
+($first:'control-center')[(unless:($talents contains 'strength'))[You gather your courage and leap off the edge of the roof. ]Your hands grasp the metal of the bottommost rung, scraping and sliding, but holding. You pull yourself up the rungs into the control center. Hey, it wasn't that hard after all.](else:)[You jump for the metal rungs and then pull yourself up into the control center.]\
+## Control Center
+Some kind of electrical control stuff must have happened here once, but it's totally trashed now. Like, (link-show:'piles of trash',?trash), broken equipment, and junk are everywhere. [[Back down->roof]] is the only place to go.
+
+(if: ($itemLoc:'a can opener') is 'offstage')[But hey, on one pile here's a perfectly good ($itemLink:'a can opener').
+]\
+(if: ($itemLoc:'a gas can') is 'offstage')[\
+  (if:($talents contains 'scent'))[\
+  You can clearly smell gasoline coming from under that (link-show:'sheet of corrugated metal',?sheet).]\
+  (else:)[You catch a faint whiff of gasoline coming from somewhere.]
+]\
+|trash)[You root around in the trash hopelessly, but there's a lot of it. You don't turn up anything useful.]\
+|sheet)[(hide:?trash)You lift the sheet (if: ($talents contains 'strength'))[effortlessly ]and throw it aside, revealing ($itemLink:'a gas can').]\
+($youCanAlsoSee:)
+
+
 :: Ocean's baby [fixed-in-place] {"position":"325,1350","size":"100,100"}
 ### Ocean's baby
 Your baby too.
+
+
+:: Ocean's perfume [memory] {"position":"950,225","size":"100,100"}
+## Ocean's perfume
+You used to like it. The perfume. But you like how Ocean smells without it better, but she doesn't believe you. She says girls are supposed to smell sweet, like oranges and rose petals. But you've always liked bitter fruits. Tamarind and lemon. 
+
+And sometimes, maybe after a fight or something, you'll drive off and that's all you can smell is her orange perfume. And even after smoking three cigarettes with the windows of your pickup rolled down you can still smell it, and it's still too sweet, and you wonder if this is working out. Because it's such a little pointless thing but it drives you crazy. And if a little thing like perfume is driving you this crazy maybe the whole thing is doomed. Maybe Ocean would be better off with some guy who likes orange perfume. 
+
+You don't know what's going to happen now.
 
 
 :: Startup [startup] {"position":"200,100","size":"100,100"}
@@ -153,6 +181,11 @@ Oh yeah, you remember, she called them sand-dancers. This little sand-dancer sti
 The little sand-dancer lizard stares at you with one slitted eye]
 
 
+:: a can opener {"position":"1125,350","size":"100,100"}
+## A can opener
+Looks like the cheap one you have back at your place.
+
+
 :: a denim jacket {"position":"200,1100","size":"100,100"}
 ### Your denim jacket
 Not much to say, a bit thread-bare, but all you have to protect you from the cold.
@@ -206,6 +239,17 @@ You open the photo, revealing an ultrasound of ($itemLink:"Ocean's baby").
 Something about the ultrasound of Ocean's baby makes you want to brood about ($itemLink:'when you heard the news').\
 ($moveToLoc: 'when you heard the news', 'emotional baggage')\
 ]
+
+
+:: a gas can {"position":"1125,600","size":"100,100"}
+($first:'gas-can')[\
+($moveToLoc:'a gas can', 'Control Center')\
+($moveToLoc:'road trips through the desert', 'emotional baggage')\
+]\
+## Gas Can
+It's full of gas, might be useful if you decide on fixing your truck and getting out of here.
+
+Something about the gas can makes you want to brood about ($itemLink:'road trips through the desert').
 
 
 :: a glove box [fixed-in-place] {"position":"200,725","size":"100,100"}
@@ -269,7 +313,7 @@ Something about the receipt from Big Jimmy's makes you want to brood about ($ite
 Hey, that roll of duct tape might be useful if you decide on fixing your truck and getting out of here.]
 
 
-:: a rusted key {"position":"875,350","size":"100,100"}
+:: a rusted key {"position":"1000,475","size":"100,100"}
 ($first: "a rusted key")[\
 ($moveToLoc: 'meeting Ocean', 'emotional baggage')\
 (set: $goToOnDone to 'foreman\'s office')]\
@@ -355,7 +399,7 @@ The emergency radio is currently switched \
 
 
 
-:: base of tower {"position":"500,350","size":"100,100"}
+:: base of tower [Around-the-Tower Tower-Vicinity] {"position":"500,350","size":"100,100"}
 (if: visits is 1)[\
 ($addToHere:'a rusty tin can')\
 ]\
@@ -364,7 +408,7 @@ Behind the concrete building, featureless except for a dust-covered window, a st
 ($youCanAlsoSee:)
 
 
-:: break room {"position":"750,475","size":"100,100"}
+:: break room [Tower-Vicinity Office-Interior] {"position":"750,475","size":"100,100"}
 ($first:'break room')[\
 ($moveToLoc:'an emergency radio', 'break room')\
 ($moveToLoc:'a wire mesh cage', 'break room')\
@@ -409,7 +453,14 @@ You pat down your pockets. Maybe you could throw something?
 You step back and throw $heavyItem at the window, it smashes through, shattering it.($moveToLoc: $heavyItem, 'staging area')(set:$windowBroken to true)(set: $goToOnDone to 'crumbling concrete')]
 
 
-:: crumbling concrete [Tower-Vicinity] {"position":"525,600","size":"100,100"}
+:: canned oranges {"position":"1000,600","size":"100,100"}
+## Canned Oranges
+You won't be hungry again till morning. 
+
+But thinking about oranges reminds you of ($itemLink:'Ocean\'s perfume').
+
+
+:: crumbling concrete [Tower-Vicinity Around-the-Tower] {"position":"525,600","size":"100,100"}
 # Crumbling Concrete
 This concrete building must've been some sort of utility structure for the [[huge electrical tower to the north->base of tower]], now abandoned: a \
 ($linkRevealPersist:'pane of cracked glass',[(set: $windowExamined to true)(show:?examine-window)]) \
@@ -489,7 +540,7 @@ You are pretty sure there is plenty of other stuff burried in that bag, but you 
 ]))
 
 
-:: foreman's office {"position":"625,350","size":"100,100"}
+:: foreman's office [Tower-Vicinity Office-Interior] {"position":"625,350","size":"100,100"}
 ($first:'foreman\'s office')[(set: $emergencyFreq to 102.3)]\
 (set: _litBy to ($locationIsLit:))\
 ## Foreman's Office
@@ -690,7 +741,29 @@ She told you her name was Ocean Running Deer and she lived on the rez and you to
 And now... no, you can't think about that yet.
 
 
-:: middle of nowhere [Tower-Vicinity] {"position":"400,725","size":"100,100"}
+:: metal barrel [fixed-in-place] {"position":"1125,475","size":"100,100"}
+($first:'metal-barrel')[(set: $barrelMoved to false)]\
+## A Metal Barrel
+A huge metal barrel stands upright and intact nearby, (if: $barrelMoved)[directly underneath the bottom rungs.](else:)[large enough you could climb up on top of it.]
+
+(unless:$barrelMoved)[\
+(link-repeat:'Push the barrel')[\
+(if: ($talents contains 'strength'))[(show:?strong-push)](else:)[(show:?weak-push)]\
+] | ]\
+(link-repeat:'Climb up on top of the barrel')[\
+(if: $barrelMoved)[(show:?climb-right)](else:)[(show:?climb-wrong)]\
+]
+|climb-wrong)[Yeah, you could get on top of it, but while it's over here you couldn't reach a whole lot.
+]\
+|weak-push)[You push against the side, but you're not strong enough to move the barrel.
+]\
+|strong-push)[Heaving, you push against the barrel, and with a horrible grating noise, it slides across the roof till it rests underneath the metal rungs.(set: $barrelMoved to true)
+]\
+|climb-right)[($clearItemHistory:)You climb up on the barrel, reach, grab the bottom rungs, and [[pull yourself up->Control Center]]
+]
+
+
+:: middle of nowhere [Tower-Vicinity Around-the-Tower] {"position":"400,725","size":"100,100"}
 (if: visits is 1)[\
 ($addToHere:'a glove box')\
 ($addToHere:'a piece of jade')\
@@ -702,9 +775,10 @@ You've smashed up against a tall Saguaro, which is all you can see out the winds
 Through the windshield, you see ($itemLinkAlias:'a little brown-colored lizard','a brown lizard') clinging frantically to the tall Saguaro.
 ($youCanAlsoSee:)
 [[Get out of the truck ->outside your truck]]and see how bad it is...
+<!--TODO See Middle of Nowhere for more description based on light and first time etc.-->
 
 
-:: outside your truck [Tower-Vicinity] {"position":"525,725","size":"100,100"}
+:: outside your truck [Tower-Vicinity Around-the-Tower] {"position":"525,725","size":"100,100"}
 # Looking around
 The tire tracks from the south stop abruptly here, but where the hell are you? The desert sand and clumps of pale sagebrush are all your dimming headlights pick out before barely reaching the concrete building to [[the north->crumbling concrete]].
 
@@ -716,6 +790,7 @@ A ($itemLinkAlias:'brown-colored lizard', 'a brown lizard') clings to a tall Sag
 ($youCanAlsoSee:)
 [[Get back in your truck->middle of nowhere]] | [[Head north->crumbling concrete]]\
 (if: $truckExamined is true)[(show: ?examine-truck)]
+<!-- TODO like the inside, see sources for changing based on first time ("Getting down") and lighting conditions (when emerg lights come on)-->
 
 
 :: overlay [overlay] {"position":"700,100","size":"100,100"}
@@ -891,7 +966,25 @@ Well, you're still stuck here. [(_reportLight:)] Maybe [(_hint:)].
 And you still haven't quit smoking. (if:$cigs is 0)[That was your last cigarette, too.](else:)[You've got (plural:$cigs, "cig", "cigs") left.]
 
 
-:: staging area {"position":"625,475","size":"100,100"}
+:: road trips through the desert [memory] {"position":"1075,225","size":"100,100"}
+## Road trips through the desert
+Always a faint whiff of gas in your truck, even on the highway at midnight with the windows cranked and scorching summer air sending Ocean's hair twisting and curling behind the passenger seat. The two of you driving through the night to visit her aunt in Santa Rosa, about a week before it happened, talking and laughing and sometimes her hand on your leg and sometimes your hand on hers, nothing alive but you and her and the truck and the road and the blackness beyond.
+
+Then all quick she leans forward at a green phantom roadsign and goes hey look, it's the road to Nakaibito! And you have no idea what she's talking about till you remember the story (and that you told her the story) and she says come on, let's go, let's find out what's there. And you're like what, now? And she laughs and says when else? And it's crazy and you tell her it's crazy, it'd be like a four hour drive there and four hours back, totally out of your way and probably for nothing, a couple trailers and broken glass, and you pass the exit and drive on and tease her a little but inside you're thinking, this is why I love her (if I do), that crazy, that what-the-hell let's do something wild and go with it spark, that's Ocean. That's your girl. And maybe you should have done it because now maybe your days of crazy gambling road trips are over, and maybe you'll never find out what's in Nakaibito or anywhere else.
+
+
+:: roof [Around-the-Tower Tower-Vicinity] {"position":"875,350","size":"100,100"}
+## Roof
+From the roof of the building, you can see the huge electrical tower rising up in front of you. At your feet is the way [[back down->storage room]].
+
+The (link-show:'metal rungs', ?metal-rungs) once led to a control booth higher up the tower, but the lower handholds have rotted away and collapsed. A huge ($itemLink:'metal barrel') rusts quietly some distance away.
+|metal-rungs)[
+(if: $talents does not contain 'courage')[The metal rungs have rusted away and crumbled; the lowest are well above your head. You don't have the courage to make the jump.]\
+(else:)[(go-to:'Control Center')]
+]
+
+
+:: staging area [Tower-Vicinity Office-Interior] {"position":"625,475","size":"100,100"}
 (set: _litBy to ($locationIsLit:))\
 (if: _litBy is 'by headlights')[\
 Faint shafts of light from your dimming headlights seep through the empty window frame, but you can barely make out anything of the interior.
@@ -899,8 +992,7 @@ Faint shafts of light from your dimming headlights seep through the empty window
 [[Go back out ->crumbling concrete]] | \
 ($itemLinkAlias:'Use your lighter to look around', 'report lighter') | (link:'Feel around in the dark')[You take a step and crack your shin against what feels like ($itemLinkAlias:'a metal desk', 'a desk'). Ouch.]
 ](else:)[\
-($first:'staging area')[Your surroundings spring into brightness around you.
-]\
+(if: _litBy is 'by flashlight')[($first:'staging area')[Your surroundings spring into brightness around you.]]\
 ## Staging Area
 It's obvious this place has been abandoned for years. Cold night air breathes through holes in the roof and everything is strewn with desert sand and patches of mold. The (link-show:'boarded-up door', ?push-it) is alongside the (link-goto: 'empty window frame', 'crumbling concrete').|push-it)[ You push against it, but the door won't budge.] Other rooms lie [[north->foreman's office]] and [[east->break room]]. In one corner is the metal desk.
 
@@ -909,8 +1001,39 @@ The floor has half-collapsed near one corner, revealing ($itemLink:'a hole') cri
 ]
 
 
-:: storage room {"position":"750,350","size":"100,100"}
+:: storage room [Tower-Vicinity Office-Interior] {"position":"750,350","size":"100,100"}
+(set: _litBy to ($locationIsLit:))\
+(set:_noLuck to (macro: [
+(out:)[You pull down a can from the shelf, grip it with the rusty can opener, and peel open the lid. Yuck: (either:'moldy peas','rotten condensed milk','black and mold-covered mushrooms','something nasty-smelling and green'). (either:'Just your luck.','Not your lucky day.','Some of these should still be good, right?')]
+]))\
 ## Storage Room
+The walls are lined with bare metal shelves, \
+(if: _litBy is 'by flashlight')[\
+casting strange patterns of shadow as you sweep your flashlight beam around.]\
+(else:)[rusting away.] \
+The [[break room]] lies back to the south and a [[utility ladder->roof]] climbs through a broken skylight to the roof.
+
+Near some rows of crumbling shelving supporting hundreds of dusty \
+(if:($itemLoc:'canned oranges') is 'offstage')[\
+(link-show:'cans of food', ?cans-of-food) \
+](else:)[cans of food] \
+(if: $emergencyLightsOn)[there is](else:)[you spot a dark] ($linkRevealPersist:'a control panel',[(show:?emergency-lights)]) for the building's emergency lights.
+
+|cans-of-food)[($first:'cans-of-food')[Hey, that food might be useful if you decide on spending the night here.
+
+]\
+(if: ($inventory:) does not contain 'can opener')[You grab one and turn it over and over in your hand, but water has soaked and crumbled away the label, and you don't have any way to get it open. Your stomach growls a little as you put it back on the shelf.\
+](else-if: ($talents) does not contain 'luck')[(_noLuck:)\
+](else:)[You run your fingers along the cans, waiting until one feels right. There's nothing, nothing, but then... yeah. That's the one. You snag it down, twist it open, and boom: mandarin oranges, unspoiled and delicious. You scarf them down, picking them out segment by segment with your chilly fingers. By the time you've polished them off you're a lot less hungry. You grab the ($itemLinkAlias:'next can','canned oranges') down for later.
+($addToInventory:'canned oranges')($moveToLoc: 'Ocean\'s perfume', 'emotional baggage')\
+]]\
+|emergency-lights)[\
+(set: $emergencyLightsOn to true)\
+($first:'emergency-lights')\
+[
+With a sharp buzz, a whiff of static and an electrical groan, bare light bulbs flicker on throughout the building.
+]]\
+($youCanAlsoSee:)
 
 
 :: test {"position":"200,350","size":"100,100"}
@@ -922,9 +1045,10 @@ The floor has half-collapsed near one corner, revealing ($itemLink:'a hole') cri
 (set: $flashlightOn to true)\
 [[Staging Area->staging area]]
 ($itemLink:'a hole')
-(set: $talents to it + (ds:'scent', 'courage', 'xstrength'))\
+(set: $talents to it + (ds:'scent', 'courage', 'strength', 'luck'))\
 [[Foreman's Office->foreman's office]]
 [[break room]]
+[[roof]]
 
 
 :: the last day of high school [memory] {"position":"700,225","size":"100,100"}
@@ -937,7 +1061,7 @@ Cox said I have here, Mr. Morales (a bad start since you hate that name) a test 
 No. They knew you cheated, deep in their smug empty hearts. They wanted you to admit it, say you were a cheater and a liar. But you weren't. You wrote that essay, every god damn word, because you really really liked the book for once and wanted to show Mrs. Burke that maybe if they gave people better books to read kids would actually learn something. But they wanted a confession. They wanted a thieving example they could parade in front of the school. Someone of your academic and behavioral and economic and racial background and yeah, screw this shit. So you got up and left and never came back. Drop out, hell. You walked out and you'd do it again.
 
 
-:: weed strewn rust {"position":"650,600","size":"100,100"}
+:: weed strewn rust [Around-the-Tower Tower-Vicinity] {"position":"650,600","size":"100,100"}
 #Weed-strewn Rust
 Behind the rather small concrete building and its tiny frosted window is nothing but a scraggly patch of yellowing weeds and dirt near a leaking pipe, littered by a collection of rusted barrels and some scattered newspapers. Desert stretches in all directions; [[back west->crumbling concrete]] is the front of the building.
 
