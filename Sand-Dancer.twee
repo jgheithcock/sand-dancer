@@ -131,6 +131,7 @@ You don't know what's going to happen now.
 (set: $talents to (ds:))\
 (set: $emergencyFrequency to 102.3)\
 (set: $currentFrequency to 77.2)\
+(set: $cigs to 6)\
 <!-- Lighting -->\
 (set: $emergencyLightsOn to false)\
 (set: $flashlightOn to false)\
@@ -275,7 +276,6 @@ A classic Zippo. You flick it open a few times.
 
 
 :: a pack of cigarettes {"position":"325,950","size":"100,100"}
-($first: 'a pack of cigarettes')[(set: $cigs to 6)]\
 ### A pack of cigarettes
 You're kind of trying to quit, but man, you could really go for one right now. (if: $cigs > 0)[It looks like you've only got (text: $cigs) left.
 
@@ -340,7 +340,7 @@ In the wallet is:
     (set: _out to it + '-' + (source: ($itemLink:_animal)) + '\n')
   ]
   (out-data:_out)
-]))
+]))\
 ###Weather-worn guidebook
 Most of the pages are faded or worn away, but flipping through, it looks like a guide to local animal life. You could try looking up various animals in it. Most of them you flip on by but you notice:
 
@@ -452,9 +452,21 @@ You tune the radio to |current-frequency>[$currentFrequency]kHz, and the radio w
 
 "Look, son," the voice says, "I don't know how you got out there but that's not important right now. Weather report's coming in and there's a cold front the size of Texas coming your way. I don't want to scare you but if you don't find a way home, or figure out some food and shelter for the night, you could freeze to death. You hear me? Now on account of the cutbacks I don't have anyone to send out there until morning. But there may be parts around that old tower you can use to patch up your truck and make it back to the highway. Or, there may be emergency supplies that would get you through the night. This storm's gonna blow out all our communication, so you're gonna be on your own. It's up to you. Over and out."
 
-You rub your face tiredly. Ocean was expecting you tonight after your shift, like usual. If you don't make it she'll be worried sick. Then on the other hand maybe you should worry about yourself first for a change. You feel like you need a cigarette and then you remember you quit. Hell, can't anything be easy?(set:$conversationOver to true)]\
+You rub your face tiredly. Ocean was expecting you tonight after your shift, like usual. If you don't make it she'll be worried sick. Then on the other hand maybe you should worry about yourself first for a change. You feel like you need a cigarette and then you remember you quit. Hell, can't anything be easy?(set:$conversationOver to true)(set:$inPursuit to true)]\
 ]\
 |no-one-there)[(hide:?link-mike)Whoever you were talking to must be off the air, you only hear the static from the radio.]
+
+
+:: backtracking {"position":"650,825","size":"100,100"}
+(if: $tradeFor is not 0)[Stupidly, you tilt your head back and stare up at the dirt ceiling, and all you can see is blackness.
+
+No wait... there's patterns, slowly shifting, barely visible in the darkness, and miles away. Like clouds. And then a drop of water falls on your face, and then another, and you realize suddenly you're outside, and it's starting to rain...
+]\
+## Backtracking
+It's quieter and darker over here, the black desert night bleeding in. Your tire tracks are hardly visible in the desert sand, and you can barely make out the way north [[back to your truck->outside your truck]].
+
+You can see a withered cactus here.
+($youCanAlsoSee:)
 
 
 :: base of tower [Around-the-Tower Tower-Vicinity] {"position":"500,450","size":"100,100"}
@@ -464,6 +476,13 @@ You rub your face tiredly. Ocean was expecting you tonight after your shift, lik
 # Base of the tower
 Behind the concrete building, featureless except for a dust-covered window, a steel girder rises from the desert sand, one of three legs of the huge electrical tower looming like some gargantuan spider into blackness above you. A tumbleweed drifts lazily against the rusted metal among scrawny weeds and crumbling trash. The desert stretches in all directions except [[back south->crumbling concrete]] or [[southeast->weed strewn rust]] towards the building.
 ($youCanAlsoSee:)
+
+
+:: bow tie [fixed-in-place] {"position":"1200,225","size":"100,100"}
+($first: "bunny's bow tie")[\
+($moveToLoc: 'her graduation night', 'emotional baggage')]\
+## The bunny's bow tie
+It's just a few lines on a silhouette. But something about the bow tie makes you brood about ($itemLink:'her graduation night').
 
 
 :: break room [Tower-Vicinity Office-Interior] {"position":"750,575","size":"100,100"}
@@ -511,13 +530,6 @@ You pat down your pockets. Maybe you could throw something?
 You step back and throw $heavyItem at the window, it smashes through, shattering it.($moveToLoc: $heavyItem, 'staging area')(set:$windowBroken to true)(set: $goToOnDone to 'crumbling concrete')]
 
 
-:: bunny's bow tie [fixed-in-place] {"position":"1200,225","size":"100,100"}
-($first: "bunny's bow tie")[\
-($moveToLoc: 'her graduation night', 'emotional baggage')]\
-## The bunny's bow tie
-It's just a few lines on a silhouette. But something about the bow tie makes you brood about ($itemLink:'her graduation night').
-
-
 :: canned oranges {"position":"950,225","size":"100,100"}
 ## Canned Oranges
 You won't be hungry again till morning. 
@@ -527,17 +539,19 @@ But thinking about oranges reminds you of ($itemLink:'Ocean\'s perfume').
 
 :: crumbling concrete [Tower-Vicinity Around-the-Tower] {"position":"525,700","size":"100,100"}
 # Crumbling Concrete
-This concrete building must've been some sort of utility structure for the [[huge electrical tower to the north->base of tower]], now abandoned: a \
+This concrete building must've been some sort of utility structure for the [[huge electrical tower to the north->base of tower]], now abandoned\
+|unbrokenWindow>[: a \
 ($linkRevealPersist:'pane of cracked glass',[(set: $windowExamined to true)(show:?examine-window)]) \
-sparkles faintly in the beam of your headlights. \
+sparkles faintly in the beam of your headlights]. \
 |examine-window)[\
 |brokenWindow)[The empty frame of a window [[leads inside->staging area]].]\
 |unbrokenWindow>[You push your face against the dusty glass window but it is too dark to see inside.(show:?suggest-break)]\
 ]
-Tendrils of desert sand drift against a ($linkRevealPersist: 'boarded-up door to the northeast',[(set:$triedDoor to true)(hide: ?untriedDoor)(show: ?triedDoor)])(t8n:"dissolve")[ leading inside; you could also ]<untriedDoor|(t8n:"dissolve")[. You shove against the door with all your weight. The door won't budge. You slam your hands against the boards in frustration. I guess you could ](triedDoor|[[walk around to the east->weed strewn rust]] or [[head south->outside your truck]] back to your truck.[(t8n:'fade')+(transition-time:.5s)+(transition-delay:1s)[ Or, you could try to ($itemLink:'break the window').]](suggest-break|
+Tendrils of desert sand drift against a ($linkRevealPersist: 'boarded-up door to the northeast',[(set:$triedDoor to true)(hide: ?untriedDoor)(show: ?triedDoor)])(t8n:"dissolve")[ leading inside; you could also ]<untriedDoor|(t8n:"dissolve")[. You shove against the door with all your weight. The door won't budge. You slam your hands against the boards in frustration. I guess you could ](triedDoor|[[walk around to the east->weed strewn rust]] or [[head south->outside your truck]] back to your truck.[(t8n:'fade')+(transition-time:.5s)+(transition-delay:1s)[ Or, you could try to ($itemLink:'break the window').]](suggest-break|\
 (if:$triedDoor is true)[(hide: ?untriedDoor)(show: ?triedDoor)]\
 (if:$windowExamined is true)[(show: ?examine-window)]\
 (if:$windowBroken is true)[(show: ?brokenWindow)(hide: ?unbrokenWindow)(hide: ?suggest-break)](else:)[(hide: ?brokenWindow)(show:?unbrokenWindow)]
+($youCanAlsoSee:)
 
 
 :: emergency blanket [fixed-in-place] {"position":"900,700","size":"100,100"}
@@ -605,6 +619,10 @@ You are pretty sure there is plenty of other stuff burried in that bag, but you 
 ]))
 
 
+:: footer [footer] {"position":"825,100","size":"100,100"}
+(display:'pursuit')
+
+
 :: foreman's office [Tower-Vicinity Office-Interior] {"position":"625,450","size":"100,100"}
 (set: _litBy to ($locationIsLit:))\
 ## Foreman's Office
@@ -619,6 +637,7 @@ Tacked to the wall is a peeling (link-show:'safety poster',?read-frequency), tex
 According to the poster, the emergency radio frequency is [$emergencyFrequency]kHz.]
 
 A half-collapsed desk is in the middle of the room(if: ($itemLoc:'a rusted key') is 'offstage')[, on it is ($itemLink:'a rusted key')].
+($youCanAlsoSee:)
 
 
 :: grandma's stories [memory] {"position":"325,325","size":"100,100"}
@@ -715,14 +734,14 @@ And that was maybe you think the first time she said she loved you, and you said
 (set: $itemLink to (macro: str-type _item, [
   (out:)[($itemLinkAlias: _item, _item)]
 ]))\
-(set: $itemsAsLinks to (macro: str-type _loc, [
+(set: $itemsAsLinks to (macro: str-type _loc, macro-type _link, [
   (set: _items to ($itemsIn: _loc))
   (set: _links to (a:))
-  (for: each _item, ...(_items))[(set: _links to it + (a:($itemLink: _item)))]
+  (for: each _item, ...(_items))[(set: _links to it + (a:(_link: _item)))]
   (out-data: _links)
 ]))\
 (set: $localItemsAsLinks to (macro: [
-  (out-data: ($itemsAsLinks: (passage:)'s name))
+  (out-data: ($itemsAsLinks: (passage:)'s name, $itemLink))
 ]))\
 (set: $itemIsFixedInPlace to (macro: str-type _item, [
   (set: _itemsTags to ((passage:_item)'s tags))
@@ -739,7 +758,7 @@ And that was maybe you think the first time she said she loved you, and you said
   (out-data: not ($itemIsFixedInPlace: _item))
 ]))\
 (set: $updateInventory to (macro:[
-  (replace: ?inventory-content)[($contentsOfList:'inventory')]
+  (replace: ?inventory-content)[($contentsOfList:'inventory', $itemLink)]
   (out-data:'')
 ]))\
 (set: $showInventory to (macro: [
@@ -760,11 +779,17 @@ And that was maybe you think the first time she said she loved you, and you said
 (set: $youCanAlsoSeeContents to (macro:[
   (set: _printLinks to (macro: array-type _links, [
     (if:_links's length is 1)[
-      (out:)[(source:(_links's 1st))]
+      (set:_theLink to _links's 1st)
+      (out:)[_theLink]
     ](else-if:_links's length is 2)[
-      (out:)[(source:_links's 2ndLast) and (source:_links's last)]
+      (set:_theLink to _links's 1st)
+      (set:_theNextLink to _links's 2nd)
+      (out:)[_theLink and _theNextLink]
     ](else:)[
-      (out:)[(for: each _i, ...(_links's 1stTo3rdLast))[_i, ](source:_links's 2ndLast) and (source:_links's last)]
+      (set:_theLink to _links's 2ndLast)
+      (set:_theLastLink to _links's last)
+      (out:)[(for: each _i, ...(_links's 1stTo3rdLast))[ _i, ]\
+     _theLink and _theLastLink]
     ]
   ]))\
   (set: _links to ($localItemsAsLinks:))\
@@ -779,8 +804,8 @@ And that was maybe you think the first time she said she loved you, and you said
 (set: $youCanAlsoSee to (macro:[
   (out:)[[($youCanAlsoSeeContents:)]<you-can-also-see|]
 ]))\
-(set: $contentsOfList to (macro: str-type _container, [
-  (set: _links to ($itemsAsLinks:_container))\
+(set: $contentsOfList to (macro: str-type _container, macro-type _link, [
+  (set: _links to ($itemsAsLinks:_container, _link))\
   (if: _links's length is 0)[
     (out:)[nothing]
   ](else:)[
@@ -791,7 +816,7 @@ And that was maybe you think the first time she said she loved you, and you said
   ]
 ]))\
 (set: $contentsOf to (macro: str-type _container, [
-  (out:)[(hook:'contents-of-'+_container)[($contentsOfList:_container)]]
+  (out:)[(hook:'contents-of-'+_container)[($contentsOfList:_container, $itemLink)]]
 ]))
 
 
@@ -845,8 +870,94 @@ You've smashed up against a tall Saguaro, which is all you can see out the winds
 
 Through the windshield, you see ($itemLinkAlias:'a little brown-colored lizard','a brown lizard') clinging frantically to the tall Saguaro.
 ($youCanAlsoSee:)
-[[Get out of the truck ->outside your truck]]and see how bad it is...
+[[Get out of the truck ->outside your truck]]($first:'in-truck')[and see how bad it is...]
 <!--TODO See Middle of Nowhere for more description based on light and first time etc.-->
+
+
+:: open desert {"position":"1075,100","size":"100,100"}
+<!-- Open Desert creates a randomly changing description of the
+desert to provide the player the impression of wandering through
+the desert for an indeterminate time. 
+  _desertDesc is the description of the desert,
+  _flotsamList creates a one or two item list of junk as they go
+  _desertFlotsam creates the sentence describing it
+-->\
+(set:_desertDesc to (macro:[
+  (set: _first to (either:
+  "Clouds of dust swirl through the air",
+  "The dust storm rages around you",
+  "Your tracks are swallowed up in moments by the billowing sand",
+  "The desert stretches around you in all directions")
+ )
+  (set:_second to (either:
+  "you shiver in the chill night air.",
+  "you plod wearily through the sand.",
+  "you wish you could see more than twenty feet in front of you.",
+  "god damn it's dark.",
+  "every inch of sand looks just like every other."
+ ))
+ (out-data:_first + ", and " + _second)
+]))\
+(set: _desertFlotsam to (macro:[
+  (set: _flotsamList to (macro:[
+    (set: _f to (a:
+    "scattered patch of dying sagebrush",
+    "dead pine tree",
+    "weatherbeaten outcropping",
+    "lizard skin"))
+    (set: _df to (ds:_f's random))
+    (set: _df to it + (ds:_f's random))
+    (out-data: (joined:" and a ", ..._df))
+  ]))\
+  (set:_first to (either:
+  "All you can make out in the darkness is a ",
+  "You can sort of see a ",
+  "Nearby is a ",
+  "Half-lost in shadows, you see a "
+ ))
+  (set: _second to (either:
+  " and that's about it.",
+  ". Nothing to write home about.",
+  "."
+ ))
+   (out-data:_first + (_flotsamList:) + _second)
+]))\
+<!-- End macros -->\
+(if: (history:)'s last is 'roof')[You stumble down the ladder and out as fast as you can.
+
+]\
+You head off in the direction of the movement, scanning with your flashlight over the skittering shadows.
+
+You walk for a long time, thoughts turning over like the sand under your sneakers. You think about your shit job. You think about Ocean and how pissed she's gonna be that you're not home. Like you tell her not to wait up for you but she always does anyway.
+
+Some wind kicks up and chucks sand in your face. You blink it out and kinda realize while you're doing it that you haven't really been paying attention to where you've been going. Another gust whines through the sagebrush and you realize with a kind of heavy feeling that with all the dust this wind is kicking up you can't see a damn thing. You can't see your pickup, you can't see the electrical tower. Not even your damn footprints. You're lost. Well, shit.
+
+##Open Desert
+(_desertDesc:)
+
+(link-reveal:'Now what?')[=
+
+(_desertDesc:)
+
+(_desertFlotsam:)
+
+You (link-show:'head off',?next-1) in the direction of the movement, scanning with your flashlight over the skittering shadows.
+
+|next-1)[=\
+(_desertDesc:)
+
+(_desertFlotsam:)
+
+You (link-show:'chase after the shadow', ?next-2), faster and faster, breath misting in the cold air.
+
+|next-2)[=\
+(_desertDesc:)
+
+(_desertFlotsam:)
+
+Some crazy thrill comes over you. You feel like a hunter. You can almost smell the thing you're chasing in the air. You //can// smell it, sweaty fur and terror. (link-goto:'You race after it.','the burrow')
+
+
 
 
 :: outside your truck [Tower-Vicinity Around-the-Tower] {"position":"525,825","size":"100,100"}
@@ -972,12 +1083,36 @@ A ($itemLinkAlias:'brown-colored lizard', 'a brown lizard') clings to a tall Sag
 ]))
 
 
+:: pursuit {"position":"950,100","size":"100,100"}
+(set: _showPursuit to (macro:[
+  (if: $inPursuit is not true)[(out-data:false)]
+  (if: (passage:)'s tags does not contain 'Around-the-Tower')[(out-data:false)]
+  (out-data:true)
+]))\
+(set:_linkToPursuit to (macro:[
+  (set:_dir to (either:"north", "east", "south", "west"))
+  (out:)[(link-goto:(_dir),'open desert')]
+]))\
+(if: (_showPursuit:))[
+($first:'in-pursuit')[Out of the corner of your eye you spot a glimpse of something moving in the darkness, off in the desert to the (_linkToPursuit:).\
+](else:)[(either:
+'You see that weird movement again',
+'There it is again',
+'Wait, you are sure you saw something'
+), (either:
+'out in the shadows',
+'off in the desert'
+) to the (_linkToPursuit:).
+]]
+
+
 :: report lighter [fixed-in-place] {"position":"575,950","size":"100,100"}
 ($clearItemHistory:)(set: _litBy to ($locationIsLit:))\
 (set: _loc to (passage:)'s name)\
 (unless: ($inventory:) contains 'a lighter')[
 You pat your pockets, but can't seem to find your lighter.
 ](else-if: _litBy is 'dark' or _litBy is 'by headlights')[\
+ ## In the flickering light...
   You flick the lighter, but the light seems grey and tiny in the face of the dark. All you can really see is \
   (if: _loc is 'staging area')[\
   ($itemLink:'a desk') by your feet, and\
@@ -1053,6 +1188,7 @@ The (link-show:'metal rungs', ?metal-rungs) once led to a control booth higher u
 (if: $talents does not contain 'courage')[The metal rungs have rusted away and crumbled; the lowest are well above your head. You don't have the courage to make the jump.]\
 (else:)[(go-to:'Control Center')]
 ]
+($youCanAlsoSee:)
 
 
 :: sage [fixed-in-place] {"position":"1325,225","size":"100,100"}
@@ -1104,7 +1240,7 @@ Near some rows of crumbling shelving supporting hundreds of dusty \
 |cans-of-food)[($first:'cans-of-food')[Hey, that food might be useful if you decide on spending the night here.
 
 ]\
-(if: ($inventory:) does not contain 'can opener')[You grab one and turn it over and over in your hand, but water has soaked and crumbled away the label, and you don't have any way to get it open. Your stomach growls a little as you put it back on the shelf.\
+(if: ($inventory:) does not contain 'can opener')[You grab one and turn it over and over in your hand, but water has soaked and crumbled away the label, and you don't have any way to get it open. Your stomach growls a little as you put it back on the shelf.
 ](else-if: ($talents) does not contain 'luck')[(_noLuck:)\
 ](else:)[You run your fingers along the cans, waiting until one feels right. There's nothing, nothing, but then... yeah. That's the one. You snag it down, twist it open, and boom: mandarin oranges, unspoiled and delicious. You scarf them down, picking them out segment by segment with your chilly fingers. By the time you've polished them off you're a lot less hungry. You grab the ($itemLinkAlias:'next can','canned oranges') down for later.
 ($addToInventory:'canned oranges')($moveToLoc: 'Ocean\'s perfume', 'emotional baggage')\
@@ -1120,22 +1256,138 @@ Near some rows of crumbling shelving supporting hundreds of dusty \
 :: test {"position":"200,450","size":"100,100"}
 ($addToInventory: 'a pack of cigarettes')\
 ($addToInventory: 'a piece of jade')\
+(set: $foundAnimals to (ds:'lizard, brown'))\
 (set: $windowExamined to true)\
 (set: $windowBroken to true)\
 ($addToInventory: 'a flashlight')\
 (set: $flashlightOn to true)\
 [[Staging Area->staging area]]
 ($itemLink:'a hole')
-(set: $talents to it + (ds:'scent', 'courage', 'strength', 'luck'))\
+<!--(set: $talents to it + (ds:'scent', 'courage', 'strength', 'luck'))-->\
 [[Foreman's Office->foreman's office]]
 [[break room]]
 [[roof]]
 ($itemLink:"bunny's bow tie")
 ($itemLink:"sage")
 (link:"Test Radio")[\
-(set: $emergencyLightsOn to true)\
-(set: $currentFrequency to $emergencyFrequency)\
-(go-to:'break room')\
+  (set: $emergencyLightsOn to true)\
+  (set: $currentFrequency to $emergencyFrequency)\
+  (go-to:'break room')\
+]
+(link:"Test Pursuit")[\
+  (set: $conversationOver to true)\
+  (set: $inPursuit to true)\
+  (go-to: 'crumbling concrete')\
+ ]
+ (link:"The Burrow")[\
+  (set: $conversationOver to true)\
+  (go-to: 'the burrow')\
+ ]
+
+
+:: the burrow {"position":"1200,100","size":"100,100"}
+(set:_memoryList to (macro:[
+  (set: _tradeLink to (macro: str-type _item, [
+    (out:)[\
+      (link-reveal:_item)[\
+        (set: $memoryToTrade to _item)\
+        ($removeFromGame: _item)\
+        (set: $talents to it + (ds:$tradeFor))\
+        (show:?fair-trade)\
+      ]\
+    ]
+  ]))
+  (out:)[($contentsOfList: 'emotional baggage', _tradeLink)]
+]))\
+($first:'burrow')[Dodging after the fleeing, skittering shadow, you're almost caught up to it when your foot trips on a rock and you stumble to the ground. But the ground doesn't stop your fall, it collapses, and you're tumbling in a shower of dirt clods down a hole, rolling down some crazy underground tunnel clutching at mud and roots, till finally you slide into some damp, fetid place, and come up a stop against something soft, huge, warm. And furry.(set: $inPursuit to false)]
+
+## Burrow
+Roots push through the earthen roof, casting weird shadows in the beam of your flashlight. It's round and small and underground in here and filled with hot sweat and animal stench. But mostly filled with something big and alive.
+
+It's huge, covered in sweaty fur stained with mud, and a huge eye stares out you above long black whiskers. You can feel its breath on your face and its heartbeat thudding through the floor and you cringe back in terror against the wall. It's... well.
+
+(link-reveal:"It's a rabbit.")[=
+
+The closer you look the weirder it gets, like it doesn't start or end in any one place or something all new-agey like that.
+
+The rabbit breathes and stares. You wonder if it's going to start talking like in some crap disney movie and then jesus christ it does...
+
+"So what'd you expect from an animal guardian?" it says, but like not with its lips, somewhere in your head instead. "Were you thinking big, nasty, sharp, pointy teeth? Waistcoat and pocket watch? Nah. Tricks are for kids. What's up, Knock?" Its whiskers twitch.
+
+//You could just, you know, (link-show:'go insane',?go-insane); or (link-show:'ask him about himself',?ask-about-bunny)//
+
+|go-insane)[I know, right? Looks like it's too late though.
+
+]\
+|ask-about-bunny)[=\
+"Oh come on, pal, you know me," he says with this kind of stupid cheerful tone, and suddenly he looks more like Buster from Arthur, scrawny and poorly animated. "I've been keeping an eye on you from the TV all these years. Your grandma asked me to, remember?" He grins, buck teeth protruding.
+
+|grandma-not-real>[//You could (link-show:'ask him about grandma',?about-grandma); or (link-show:"tell him about how he's not real", ?not-real).//
+
+]\
+|about-grandma)[(hide:?grandma-not-real)"She was wrong about lots of stuff," Buster says, scratching himself with a hind paw thoughtfully, "but right about lots too. Oh, lots."(show:?rabbits-judgement)
+
+]\
+|not-real)[(hide:?grandma-not-real)"Oh, don't say that!" the rabbit says, animated eyes going round like saucers. "Then it'd be just you here all alone, and wouldn't that be boring. It's much more interesting if I'm really around."(show:?rabbits-judgement)
+
+]\
+|rabbits-judgement)[(if: $cigs < 6)["Yo, you started smokin' again?" Buster asks, sniffing disdainfully, except he's not Buster any more, more like Eminem. "I thought you quit that shit, dawg. It's cool, I won't tell your grandma, but it makes Thumper cry a little, you know what I'm sayin'?"](else:)["Hey yo, you been hella good about keepin' off those cancer sticks," Buster says, except he's not Buster any more, more like Eminem. "Don't think I ain't watchin' ya.'"] (Oh hey, Rabbit Smith, you get it.)
+
+//You could ask him (link-show:'how he knows so much',?knows-so-much).//
+
+]\
+|knows-so-much)[=\
+"Hey, back off, man," he says, "it's my `****`in' job." And there's actually like a bleep, too, and now that you think of it you only ever saw 8 Mile on TV.
+
+"Anyway, look, man, we both know you're in trouble. I just gotta ask you one question." And he changes again into like a giant silhouette, and it's the Playboy Bunny, ears and ($itemLink:'bow tie') and all. "Do you love her?"($moveToLoc:"her graduation night", 'emotional baggage')
+
+|say-yes-or-no>[//You could say (link-show:'yes', ?say-yes) or (link-show:'no', ?say-no) or tell him that (link-show:"you don't know", ?say-i-dunno).//
+]\
+|say-yes)[You tell the rabbit you do.
+
+"Then you should probably get home and tell her," the bunny says. "Patch up that truck and fly down that highway before she gets away." It winks.(show:?rabbits-choices)(hide:?say-yes-or-no)
+
+]\
+|say-no)[You tell the rabbit no.
+
+"Then what are you still doing with her?" the bunny says. "Get out while the getting's good. You think either of you will be happier if you put that off? There's fish in other oceans kid. You've got your whole life ahead to swim." It winks.(show:?rabbits-choices)(hide:?say-yes-or-no)
+
+]\
+|say-i-dunno)[You tell the rabbit you don't know.
+
+"Yeah," the bunny says, "well this is the night to figure it out. Whether you decide to go home to her tonight or take care of yourself tonight might have consequences on a night with a storm like the one that's coming. Just sayin'." It winks.(show:?rabbits-choices)(hide:?say-yes-or-no)
+
+]\
+|rabbits-choices)[=\
+"Look," he says, and now he's big and fluffy and smells like springtime and peeps. "I can help you make your decisions. I'll trade you for one of these talents." He holds out an easter basket filled with plastic green easter grass; in it are two glowing orbs.
+
+"(link-repeat:'Strength')[(show:?trade-for-strength)(hide:?trade-for-courage)]," he says, pointing to the first one, "and (link-repeat:'courage')[(show:?trade-for-courage)(hide:?trade-for-strength)]. Pick whichever one you think will be most useful, but you have to give me something back. (link-show:'Something real',?something-real), something I can work with."
+
+|something-real)["For a talent like this, you ought to put up something real. Something you care about. Something that is a part of you - like a memory."
+
+"You won't lose what you trade entirely," he says, twitching his whiskers, "but it will change, transverse, be resurrected as something else. Reborn."
+
+]\
+|trade-for-strength)["Might be useful for surviving through the night," he says,"if that's what you're planning."
+
+"What memory will you trade me for strength?"(set:$tradeFor to "strength")
+(_memoryList:)\
+]\
+|trade-for-courage)["You're going to need it to get home to Ocean,' he says, 'if that's what you want."
+
+"What memory will you trade me for courage?"(set:$tradeFor to "courage")
+(_memoryList:)\
+]\
+|fair-trade)[(hide:?trade-for-strength)(hide:?trade-for-courage)\
+You offer to trade your memory of $memoryToTrade for $tradeFor.
+
+The rabbit nods. "Yes," he says, "a fair trade." And something happens inside you as he says it. Your memory of $memoryToTrade shifts and wriggles and fades away and it's still there, but now it's shifted, become something else. And yeah, it kinda does feel like you could call it $tradeFor. Cool.
+
+"The others are coming," he says, "they'll be here soon," and now he looks like Frank from Donnie Darko and his face is behind that freaky metal mask and his voice is distorted and makes your skin crawl.
+
+"Watch out for them," he says. "We all want to help, but... the others are wilier than me. Look up."
+
+"[[Look up->backtracking]], Naki," he says again.
 ]
 
 
@@ -1160,13 +1412,14 @@ So while Peter is trying to start a rock band or something Karl starts spouting 
 #Weed-strewn Rust
 Behind the rather small concrete building and its tiny frosted window is nothing but a scraggly patch of yellowing weeds and dirt near a leaking pipe, littered by a collection of rusted barrels and some scattered newspapers. Desert stretches in all directions; [[back west->crumbling concrete]] is the front of the building.
 
-|guide-book>[Atop one overturned barrel is (link:'a weather-worn guidebook')[($addToInventory:'a weather-worn guidebook')($showItem:'a weather-worn guidebook')(t8n:'fade')(transition-delay:1s)[(hide:?guide-book)]]
+|guide-book)[Atop one overturned barrel is (link:'a weather-worn guidebook')[($addToInventory:'a weather-worn guidebook')($showItem:'a weather-worn guidebook')(hide:?guide-book)]
 
 ]The cold night air swirls around you, and you pull your jacket closer.
 
 (if: visits is 1)[Something about the weather-worn guidebook makes you want to brood about ($itemLink:'the last day of high school').]\
 ($moveToLoc:'the last day of high school', 'emotional baggage')\
 (if: ($itemLoc:'a weather-worn guidebook') is 'offstage')[(show: ?guide-book)]
+($youCanAlsoSee:)
 
 
 :: when you heard the news [memory] {"position":"575,325","size":"100,100"}
