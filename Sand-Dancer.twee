@@ -70,11 +70,31 @@ You don't know what's going to happen now.
   (set: $TheLog to it + (_toLog) + '\n')
   (out-data:'')
 ]))\
-<!-- Text utilities -->\
+<!-- Utilities -->\
 (set: $tab to "&nbsp;&nbsp;")\
 (set: $lastVisitedWas to (macro: str-type _passage, [
   <!-- Handle when history is an empty array (and last fails) -->
   (out-data: _passage is ((a:"Start") + (history:))'s last))
+]))\
+(set: $dsIntersection to (macro: dataset-type _a, dataset-type _b, [
+  (out-data:_a - (_a - _b))
+]))\
+<!-- $indexOf finds the indes of an item in an array - ($indexOf:'x', _a) -->\
+(set: $indexOf to (macro: any-type _k, array-type _a, [
+  (set: _index to 1)
+  (for: each _i, ..._a)[
+    (if: _i is _k)[(out-data: _index)]
+    (set: _index to it + 1)
+  ]
+  (out-data:0)
+]))\
+<!-- returns array with all elements equal to _s replaced with _r -->
+(set: $substitute to (macro: any-type _s, any-type _r, array-type _a, [
+  (set: _result to (a:))
+  (for: each _i, ..._a)[
+    (if: _i is _s)[(set: _result to it + (a:_r))](else:)[(set:_result to it + (a:_i))]
+  ]
+  (out-data:_result)
 ]))\
 <!-- linkPersist & linkRevealPersist -->\
 <!-- Support for persistent links (once clicked, continue to show revealed content) -->\
@@ -637,6 +657,8 @@ You are pretty sure there is plenty of other stuff burried in that bag, but you 
 
 :: footer [footer] {"position":"825,100","size":"100,100"}
 (display:'pursuit')\
+(display:'sinister radio')\
+(display:'temptation')\
 (display:'weather')
 
 
@@ -819,7 +841,7 @@ And that was maybe you think the first time she said she loved you, and you said
   (if: _links's length is 0)[
     (out:)[]
   ](else:)[
-    (out:)[<tw-consecutive-br/>You can see (_printLinks: _links).<tw-consecutive-br/>]
+    (out:)[<tw-consecutive-br/>You can see (_printLinks: _links).]
   ]
 ]))\
 (set: $youCanAlsoSee to (macro:[
@@ -1215,6 +1237,51 @@ The (link-show:'metal rungs', ?metal-rungs) once led to a control booth higher u
 ($youCanAlsoSee:)
 
 
+:: sinister radio {"position":"1450,225","size":"100,100"}
+(if: $sinisterRadio > 0 and (passage:)'s name is 'break room')[\
+(set: _plansRequire to (ds:'emergency blanket', 'canned oranges', 'a gas can', 'a roll of duct tape'))\
+(set: _neededForPlan to ($dsIntersection: _plansRequire, (ds:...($inventory:))))\
+(set: _talents to (a:...($talents)))\
+(set: _radioLeftOff to "")\
+(unless: $radioIsOn is true)[($first:'radioLeftOff')[\
+(set: _radioLeftOff to ", which is weird because you're damn sure you turned it off")]]\
+  (if: $sinisterRadio is 1)[\
+  <tw-consecutive-br/>\
+  With a sudden growl of static the radio springs to life[_radioLeftOff] and it freaks the hell out of you. The voice weaves in and out of crazy whirling distortion and shifting blasts of static. 'Hey... receiving? ...never told... you'll never, never--' A wail like an 8-bit banshee screams through the signal. '...waste of time... who do you think?...' Static, static. 'Very soon now, Nak... akaibito... very...'
+
+  Uh. You're pretty sure you never told that dude your name. Maybe you're just hearing things.\
+  (set: $sinisterRadio to it + 1)\
+  ](else-if: $sinisterRadio is 2)[\
+  <tw-consecutive-br/>\
+  The radio growls to life again[_radioLeftOff], the voice distorted now under a constant barrage of electronic rain. 'Where do you think you're going?' it says. 'What are you trying to do? You can't...' A snap, some syncopated crackles. '...can see you, Na... know where... never going to work. Never g--' And the voice cuts off, replaced by a low, tooth-rattling hum.\
+  <tw-consecutive-br/>\
+  The voice sounds different than before. I mean it still kind of sounds like the first guy you talked to but it sounds like someone else now too, someone you know, you've known for a long time. Someone you're afraid of.\
+  (set: $sinisterRadio to it + 1)\
+  ](else-if: $planThreatened is not true and (_neededForPlan)'s length > 0)[\
+    <tw-consecutive-br/>\
+  Static squeals from the radio[_radioLeftOff]. 'Hey,' the speaker shouts, 'hey, do you really think that [_neededForPlan] is going to help you with anything? You can't even--' and static reclaims it again.
+  (set: $planThreatened to true)\
+  ](else-if: $memoryThreatened is not true and ($itemsIn:'emotional baggage')'s length > 0)[\
+    <tw-consecutive-br/>\
+    (set: _memory to (either:...($itemsIn:'emotional baggage')))\
+  The static on the radio resolves into overlapping whispers[_radioLeftOff]. 'It makes for a nice story,' the whispers say, 'but you're remembering [_memory] all wrong. That's not really how it happened, was it? Was it, Knock? Was--' and they repeat and overlap and echo and fade back into the mutters of the static.
+  (set: $memoryThreatened to true)\
+  ](else-if: $talentThreatened is not true and (_talents)'s length > 0)[\
+    (set: _talentList to (joined:" and ", ...($substitute:"scent", "ability to scent things out", _talents)))\
+    (set:_isAre to "is")\
+    (if: (_talents)'s length > 1)[(set: _isAre to "are")]\
+    <tw-consecutive-br/>\
+    "You're nothing," the radio spews, "your [_talentList] [_isAre] worthless. You'll never amount to anything, and neither will your kid, just another half-breed loser destined to die in poverty and live in debt, isn't that right, Knock?" and with a sudden shock you realize why the voice sounds so familiar. It's your voice. It's your own god-damned voice.
+    (set: $talentThreatened to true)\
+  ](else:)[\
+  <tw-consecutive-br/>\
+  (either:
+  "The radio fizzles and growls through weird twists of distortion.",
+  "Angry distortion bubbles and pops from the radio speaker, twisting in weird rhythmic patterns."
+  )]\
+]
+
+
 :: smell of sage [fixed-in-place] {"position":"1325,225","size":"100,100"}
 ($first: "sage")[\
 ($moveToLoc: 'watching Family Guy with Karl', 'emotional baggage')]\
@@ -1282,6 +1349,15 @@ Near some rows of crumbling shelving supporting hundreds of dusty \
 ($youCanAlsoSee:)
 
 
+:: temptation {"position":"1450,100","size":"100,100"}
+(if: $rainstorm is -1 and 
+(history:) contains 'Control Center' and 
+(passage:)'s tags does not contain 'Office-Interior')[\
+<tw-consecutive-br/>\
+($first:'temptation')[You stop in mid-stride as your eyes flick to the horizon. Way out in the desert, silhouetted on a rise, a distant figure stands. As you watch he raises a hand and waves.](else:)[(if:(random:1, 3) is 1)[The distant figure waves again, out in the deep desert.]]
+]
+
+
 :: test {"position":"200,450","size":"100,100"}
 ($addToInventory: 'a pack of cigarettes')\
 ($addToInventory: 'a piece of jade')\
@@ -1323,6 +1399,17 @@ Near some rows of crumbling shelving supporting hundreds of dusty \
   (set: $talents to it + (ds:'courage'))\
   (set: $rainstorm to 1)\
   (go-to: 'backtracking')\
+]
+(link:"Sinister Radio")[\
+  (set: $emergencyLightsOn to true)\
+  (set: $conversationOver to true)\
+  (set: $memoryToTrade to 'You ain\'t seen nothing yet')\
+  (set: $tradeFor to 'courage')\
+  (set: $talents to it + (ds:'courage'))\
+  (set: $rainstorm to 1)\
+  (set: $sinisterRadio to 1)\
+  ($addToInventory:'a roll of duct tape')\
+  (go-to: 'staging area')\
 ]
 
 
@@ -1433,6 +1520,7 @@ The rabbit nods. "Yes," he says, "a fair trade." And something happens inside yo
 
 "[[Look up->backtracking]], Naki," he says again.\
 (set: $rainstorm to 1)\
+(set: $sinisterRadio to 1)\
 ]
 
 
@@ -1468,14 +1556,15 @@ So while Peter is trying to start a rock band or something Karl starts spouting 
     (set: $rainstorm to it + 1)\
   ](else-if: $rainstorm is 5)[\
     <tw-consecutive-br/>\
-    The rain's dying down, the sounds of the storm fading, water sinking into the thirsty sand leaving only the ($itemLink:'smell of sage') behind.
+    The rain's dying down, the sounds of the storm fading, water sinking into the thirsty sand leaving only the ($itemLink:'smell of sage') behind.\
+    ($moveToLoc: 'watching Family Guy with Karl', 'emotional baggage')\
     (set: $rainstorm to -1)\
   ](else-if: (passage:)'s tags contains 'Office-Interior')[\
     <tw-consecutive-br/>\
     (str:(rotated: $rainstorm, ...$rainDescriptions)'s 1st)
     (set: $rainstorm to it + 1)\
   ]\
-](else-if: (random: 1, 2) is 1)[\
+](else-if: (random: 1, 7) is 1)[\
   <!-- Normal weather reporting -->\
   <tw-consecutive-br/>\
   (either:
