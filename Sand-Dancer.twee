@@ -24,7 +24,7 @@ Sand-Dancer
 }
 
 
-:: Control Center [Office-Interior Tower-Vicinity] {"position":"1000,450","size":"100,100"}
+:: Control Center [Office-Interior Tower-Vicinity] {"position":"1000,575","size":"100,100"}
 ($first:'control-center')[(unless:($talents contains 'strength'))[You gather your courage and leap off the edge of the roof. ]Your hands grasp the metal of the bottommost rung, scraping and sliding, but holding. You pull yourself up the rungs into the control center. Hey, it wasn't that hard after all.](else:)[You jump for the metal rungs and then pull yourself up into the control center.]\
 ## Control Center
 Some kind of electrical control stuff must have happened here once, but it's totally trashed now. Like, (link-show:'piles of trash',?trash), broken equipment, and junk are everywhere. [[Back down->roof]] is the only place to go.
@@ -46,7 +46,7 @@ Some kind of electrical control stuff must have happened here once, but it's tot
 ($youCanAlsoSee:)
 
 
-:: Ocean's perfume [memory] {"position":"950,325","size":"100,100"}
+:: Ocean's perfume [memory] {"position":"825,450","size":"100,100"}
 ## Ocean's perfume
 You used to like it. The perfume. But you like how Ocean smells without it better, but she doesn't believe you. She says girls are supposed to smell sweet, like oranges and rose petals. But you've always liked bitter fruits. Tamarind and lemon. 
 
@@ -195,7 +195,7 @@ You don't know what's going to happen now.
 ]))
 
 
-:: a brown lizard [fixed-in-place] {"position":"325,1075","size":"100,100"}
+:: a brown lizard [fixed-in-place] {"position":"325,575","size":"100,100"}
 (set: $lizardVisits to $lizardVisits + 1)\
 (if: $lizardVisits is 1)[\
 ### A brown-colored lizard
@@ -208,17 +208,17 @@ Oh yeah, you remember, she called them sand-dancers. This little sand-dancer sti
 The little sand-dancer lizard stares at you with one slitted eye]
 
 
-:: a can opener {"position":"1125,450","size":"100,100"}
+:: a can opener {"position":"1125,575","size":"100,100"}
 ## A can opener
 Looks like the cheap one you have back at your place.
 
 
-:: a denim jacket {"position":"200,1075","size":"100,100"}
+:: a denim jacket {"position":"200,575","size":"100,100"}
 ### Your denim jacket
 Not much to say, a bit thread-bare, but all you have to protect you from the cold.
 
 
-:: a desk [fixed-in-place] {"position":"450,575","size":"100,100"}
+:: a desk [fixed-in-place] {"position":"450,700","size":"100,100"}
 ($first:'metal-desk')[($moveToLoc:'a flashlight','a desk')\
 ($clearItemHistory:)]\
 ## Metal Desk
@@ -226,12 +226,12 @@ You feel around the edge of the desk, and find that it has (link-reveal:'a drawe
 You slide the drawer open by feel in the darkness. (if:($itemLoc:'a flashlight') is 'a desk')[Something large and lumpy rolls around inside - ($itemLink:'a flashlight')?](else:)[It is empty.]]
 
 
-:: a driver's license [fixed-in-place] {"position":"325,1200","size":"100,100"}
+:: a driver's license [fixed-in-place] {"position":"200,825","size":"100,100"}
 ### Your driver's license
 When the highway patrol pulls you over they see your kind of crazy uncombed hair (morning), your brown name (Nakaibito Morales) and brown skin (actually more kinda tan), your D.O.B. (eighteen years ago just barely) and tribal affiliation card (expired) and assume you're either some kind of native eco-terrorist, illegal drug-running border jumper, or delinquent high school dropout (all lies except for kinda maybe the last one a little). Unless it's Jimmy Kay who pulled you over since he usually just wants to buy you a beer and talk about your dad, which is weird but better than getting a ticket.
 
 
-:: a flashlight {"position":"325,575","size":"100,100"}
+:: a flashlight {"position":"325,700","size":"100,100"}
 ## Flashlight
 ($first:'a flashlight')[($addToInventory:'a flashlight')Yeah, it's a flashlight all right. You grip it in sudden relief, turning it in your hands till your finger finds the switch.]
 
@@ -256,7 +256,7 @@ When the highway patrol pulls you over they see your kind of crazy uncombed hair
 ]
 
 
-:: a folded photo {"position":"575,225","size":"100,100"}
+:: a folded photo {"position":"450,350","size":"100,100"}
 ### A folded photo
 (if: $broodedMemories's length < 2)[\
 You just can't deal with that right now. Maybe after you've spent more time brooding.
@@ -268,7 +268,7 @@ Something about the ultrasound of Ocean's baby makes you want to brood about ($i
 ]
 
 
-:: a gas can {"position":"1075,225","size":"100,100"}
+:: a gas can {"position":"950,350","size":"100,100"}
 ($first:'gas-can')[\
 ($moveToLoc:'a gas can', 'Control Center')\
 ($moveToLoc:'road trips through the desert', 'emotional baggage')\
@@ -279,7 +279,7 @@ It's full of gas, might be useful if you decide on fixing your truck and getting
 Something about the gas can makes you want to brood about ($itemLink:'road trips through the desert').
 
 
-:: a glove box [fixed-in-place] {"position":"200,825","size":"100,100"}
+:: a glove box [fixed-in-place] {"position":"200,1075","size":"100,100"}
 ($first:'a glove box')[\
 ($moveToLoc:'a pack of cigarettes', 'a glove box')\
 ]\
@@ -287,7 +287,7 @@ Something about the gas can makes you want to brood about ($itemLink:'road trips
 ($contentsOf:'a glove box')
 
 
-:: a hole [fixed-in-place] {"position":"200,575","size":"100,100"}
+:: a hole [fixed-in-place] {"position":"1125,700","size":"100,100"}
 ($first:'a hole')[($moveToLoc:'a roll of duct tape','a hole')]\
 ## A hole in the floor
 (if: ($itemLoc:'a roll of duct tape') is 'a hole')[\
@@ -304,7 +304,7 @@ A classic Zippo. You flick it open a few times.
 ($itemLinkAlias:'Get a little light here', 'report lighter')
 
 
-:: a pack of cigarettes {"position":"325,950","size":"100,100"}
+:: a pack of cigarettes {"position":"325,1075","size":"100,100"}
 ### A pack of cigarettes
 You're kind of trying to quit, but man, you could really go for one right now. (if: $cigs > 0)[It looks like you've only got (text: $cigs) left.
 
@@ -313,20 +313,20 @@ You could (link:'light one up now')[($addToInventory:'a pack of cigarettes')($sh
 
 
 
-:: a piece of jade [item] {"position":"325,225","size":"100,100"}
+:: a piece of jade [item] {"position":"200,350","size":"100,100"}
 (metadata: 'inventory', 'item')
 ### A piece of jade
 Grandma said it will bring you luck, which hasn't really been working out. You can't remember now how it ended up in your pickup truck. Maybe someday you'll see someone lucky and you can throw it at him.
 
 
-:: a receipt from Big Jimmy's [fixed-in-place] {"position":"450,225","size":"100,100"}
+:: a receipt from Big Jimmy's [fixed-in-place] {"position":"325,350","size":"100,100"}
 ($first: "a receipt from Big Jimmy's")[\
 ($moveToLoc: 'your shit job', 'emotional baggage')]\
 ### A receipt from Big Jimmy's
 Something about the receipt from Big Jimmy's makes you want to brood about ($itemLink:'your shit job').
 
 
-:: a roll of duct tape [fixed-in-place] {"position":"200,700","size":"100,100"}
+:: a roll of duct tape [fixed-in-place] {"position":"1125,825","size":"100,100"}
 (if: ($itemLoc:'a roll of duct tape') is 'a hole')[\
   (if: $talents contains 'courage')[\
     You reach down into the hole, brushing the cobwebs away impatiently, and pull out the duct tape. Taken.($addToInventory:'a roll of duct tape')($clearItemHistory:)\
@@ -339,7 +339,7 @@ Something about the receipt from Big Jimmy's makes you want to brood about ($ite
 Hey, that roll of duct tape might be useful if you decide on fixing your truck and getting out of here.]
 
 
-:: a rusted key {"position":"825,225","size":"100,100"}
+:: a rusted key {"position":"700,350","size":"100,100"}
 ($first: "a rusted key")[\
 ($moveToLoc: 'meeting Ocean', 'emotional baggage')\
 (set: $goToOnDone to 'foreman\'s office')]\
@@ -347,12 +347,12 @@ Hey, that roll of duct tape might be useful if you decide on fixing your truck a
 Something about the rusted key makes you want to brood about ($itemLink:'meeting Ocean').
 
 
-:: a rusty tin can {"position":"450,1075","size":"100,100"}
+:: a rusty tin can {"position":"775,950","size":"100,100"}
 ### A rusty tin can
 Someone left a tin can here years ago: ridged ripples run down its rusty side.
 
 
-:: a wallet {"position":"200,1200","size":"100,100"}
+:: a wallet {"position":"200,700","size":"100,100"}
 ($first: 'a wallet')[\
 ($moveToLoc:'a driver\'s license', 'a wallet')\
 ($moveToLoc:'a receipt from Big Jimmy\'s', 'a wallet')\
@@ -362,7 +362,7 @@ In the wallet is:
 ($contentsOf:'a wallet')
 
 
-:: a weather-worn guidebook {"position":"700,225","size":"100,100"}
+:: a weather-worn guidebook {"position":"575,350","size":"100,100"}
 (set:_listOfAnimals to (macro: [
   (set: _out to '')
   (for: each _animal, ...$foundAnimals)[
@@ -376,7 +376,7 @@ Most of the pages are faded or worn away, but flipping through, it looks like a 
 (_listOfAnimals:)
 
 
-:: a wire mesh cage [fixed-in-place] {"position":"775,700","size":"100,100"}
+:: a wire mesh cage [fixed-in-place] {"position":"775,825","size":"100,100"}
 (set: $goToOnDone to 'break room')\
 ## Wire mesh cage
 
@@ -396,7 +396,7 @@ The cage seems to be locked.\
 ]
 
 
-:: an emergency radio [fixed-in-place] {"position":"875,575","size":"100,100"}
+:: an emergency radio [fixed-in-place] {"position":"875,700","size":"100,100"}
 ($first:'emergency-radio')[\
   (set:$radioIsOn to false)\
 ]\
@@ -484,7 +484,7 @@ You rub your face tiredly. Ocean was expecting you tonight after your shift, lik
 |no-one-there)[(hide:?link-mike)You try to raise someone, but there's no response(if: $currentFrequency is not $emergencyFrequency)[, at least on this frequency].]
 
 
-:: backtracking {"position":"650,825","size":"100,100"}
+:: backtracking {"position":"650,950","size":"100,100"}
 ($first:'withered-cactus')[($addToHere:'a withered cactus')]\
 (if: $tradeFor is not 0)[($first:'trade-for-done')[Stupidly, you tilt your head back and stare up at the dirt ceiling, and all you can see is blackness.
 
@@ -496,7 +496,7 @@ It's quieter and darker over here, the black desert night bleeding in. Your tire
 |south)[You stare back down the pickup's path uneasily. The tracks are swallowed by blackness, quickly melding, blending, and vanishing into a maze of ATV tracks, coyote trails, rocky outcrops, and shadows. You squint at the horizon. There's no distant sweep of headlights, no sound of trucks shifting through lonely gears. Nothing. Nothing at all. You're way off the road, and there's no chance at all of finding it again in this demon dark.<tw-consecutive-br/>]
 
 
-:: base of tower [Around-the-Tower Tower-Vicinity] {"position":"500,450","size":"100,100"}
+:: base of tower [Around-the-Tower Tower-Vicinity] {"position":"500,575","size":"100,100"}
 (if: visits is 1)[\
 ($addToHere:'a rusty tin can')\
 ]\
@@ -505,14 +505,14 @@ Behind the concrete building, featureless except for a dust-covered window, a st
 ($youCanAlsoSee:)
 
 
-:: bow tie [fixed-in-place] {"position":"1200,225","size":"100,100"}
+:: bow tie [fixed-in-place] {"position":"1075,350","size":"100,100"}
 ($first: "bunny's bow tie")[\
 ($moveToLoc: 'her graduation night', 'emotional baggage')]\
 ## The bunny's bow tie
 It's just a few lines on a silhouette. But something about the bow tie makes you brood about ($itemLink:'her graduation night').
 
 
-:: break room [Tower-Vicinity Office-Interior] {"position":"750,575","size":"100,100"}
+:: break room [Tower-Vicinity Office-Interior] {"position":"750,700","size":"100,100"}
 ($first:'break room')[\
 ($moveToLoc:'an emergency radio', 'break room')\
 ($moveToLoc:'a wire mesh cage', 'break room')\
@@ -522,7 +522,7 @@ Shadows and grime linger in dark corners of this dismal room with just one tiny 
 ($youCanAlsoSee:)
 
 
-:: break the window [fixed-in-place] {"position":"400,700","size":"100,100"}
+:: break the window [fixed-in-place] {"position":"400,825","size":"100,100"}
 (set:_itemsToTry to (macro:[
   (set:_heavyLink to (macro:str-type _item, [
     (out:)[\
@@ -557,14 +557,14 @@ You pat down your pockets. Maybe you could throw something?
 You step back and throw $heavyItem at the window, it smashes through, shattering it.($moveToLoc: $heavyItem, 'staging area')(set:$windowBroken to true)(set: $goToOnDone to 'crumbling concrete')]
 
 
-:: canned oranges {"position":"950,225","size":"100,100"}
+:: canned oranges {"position":"825,350","size":"100,100"}
 ## Canned Oranges
 You won't be hungry again till morning. 
 
 But thinking about oranges reminds you of ($itemLink:'Ocean\'s perfume').
 
 
-:: crumbling concrete [Tower-Vicinity Around-the-Tower] {"position":"525,700","size":"100,100"}
+:: crumbling concrete [Tower-Vicinity Around-the-Tower] {"position":"525,825","size":"100,100"}
 # Crumbling Concrete
 This concrete building must've been some sort of utility structure for the [[huge electrical tower to the north->base of tower]], now abandoned. \
 |unbrokenWindow>[A ($linkRevealPersist:'pane of cracked glass',[(set: $windowExamined to true)(show:?examine-window)])\
@@ -581,12 +581,12 @@ This concrete building must've been some sort of utility structure for the [[hug
 ($youCanAlsoSee:)
 
 
-:: emergency blanket [fixed-in-place] {"position":"900,700","size":"100,100"}
+:: emergency blanket [fixed-in-place] {"position":"900,825","size":"100,100"}
 ## Emergency blanket
 Hey, that emergency blanket might be useful if you decide on spending the night here.
 
 
-:: emotional baggage [fixed-in-place] {"position":"200,275","size":"100,100"}
+:: emotional baggage [fixed-in-place] {"position":"950,100","size":"100,100"}
 ### Emotional baggage
 Your guidance counselor used to say you're always carrying it with you. You imagine it's kind of ugly, lumpy, and green, and definitely has a stuck zipper.
 (if: ($itemsIn:'emotional baggage')'s length > 1)[\
@@ -662,7 +662,7 @@ You are pretty sure there is plenty of other stuff burried in that bag, but you 
 (display:'weather')
 
 
-:: foreman's office [Tower-Vicinity Office-Interior] {"position":"625,450","size":"100,100"}
+:: foreman's office [Tower-Vicinity Office-Interior] {"position":"625,575","size":"100,100"}
 (set: _litBy to ($locationIsLit:))\
 ## Foreman's Office
 (if: _litBy is 'by flashlight')[\
@@ -679,7 +679,7 @@ A half-collapsed desk is in the middle of the room(if: ($itemLoc:'a rusted key')
 ($youCanAlsoSee:)
 
 
-:: grandma's stories [memory] {"position":"325,325","size":"100,100"}
+:: grandma's stories [memory] {"position":"200,450","size":"100,100"}
 (set: $broodedMemories to it + (ds:"grandma's stories"))\
 ### Grandma's stories
 "There are dark spirits who roam the earth, little Knock." Grandma used to say that, holding you tight and stroking your hair. "There are dark spirits who roam the earth, but you're not alone. Oh, no. I'm here." (She'd kiss your head and you'd squeeze her back.) "But others are watching out for you too. You have three animal guardians, hmm? Spirits who are always watching over you. Oh, you can't always trust them to know what's best. Remember that, Knock. But when you need help, they'll come, and protect you from the worser things in the world."
@@ -709,7 +709,7 @@ Mom would yell at Grandma a lot for filling your head with that new-age bullshit
  (append: ?sidebar)[(link-repeat:"Stuff...")[($showInventory:)]]
 
 
-:: her graduation night [memory] {"position":"1200,325","size":"100,100"}
+:: her graduation night [memory] {"position":"1075,450","size":"100,100"}
 ## Her graduation night
 She grinned when you picked her up, and you drove on in to Mike's and the lot was filled with trucks and Mike's was filled with Indian guys and Indian girls and she was still the most beautiful, and you danced a lot and drank some and left early to go lie down under the stars and count the shooting ones.
 
@@ -863,13 +863,13 @@ And that was maybe you think the first time she said she loved you, and you said
 ]))
 
 
-:: lizard, brown [fixed-in-place] {"position":"700,950","size":"100,100"}
+:: lizard, brown [fixed-in-place] {"position":"700,1075","size":"100,100"}
 You look up the brown-colored lizard in the guidebook and quickly identify it: those eyes are a dead giveaway. The entry says it's a 'rare subspecies of the common desert lizard found only in the deep desert near Oro Oeste, and known to native peoples as a //sand-dancer//. In legends, the sand-dancer was a clever trickster and twister of words, who created night by tricking the sun into spending half the day underground.'
 
 Huh.
 
 
-:: meeting Ocean [memory] {"position":"825,325","size":"100,100"}
+:: meeting Ocean [memory] {"position":"700,450","size":"100,100"}
 ## Meeting Ocean
 She was buying a Fresca at Big Jimmy's when you got off your shift, shoving work keys in your pocket, and you stood behind her waiting to get some cigs, almost too tired to notice how cute she was but still noticing, yeah, still noticing.
 
@@ -880,7 +880,7 @@ She told you her name was Ocean Running Deer and she lived on the rez and you to
 And now... no, you can't think about that yet.
 
 
-:: metal barrel [fixed-in-place] {"position":"1000,575","size":"100,100"}
+:: metal barrel [fixed-in-place] {"position":"1000,700","size":"100,100"}
 ($first:'metal-barrel')[(set: $barrelMoved to false)]\
 ## A Metal Barrel
 A huge metal barrel stands upright and intact nearby, (if: $barrelMoved)[directly underneath the bottom rungs.](else:)[large enough you could climb up on top of it.]
@@ -902,7 +902,7 @@ A huge metal barrel stands upright and intact nearby, (if: $barrelMoved)[directl
 ]
 
 
-:: middle of nowhere [Tower-Vicinity Around-the-Tower] {"position":"400,825","size":"100,100"}
+:: middle of nowhere [Tower-Vicinity Around-the-Tower] {"position":"400,950","size":"100,100"}
 (if: visits is 1)[\
 ($addToHere:'a glove box')\
 ($addToHere:'a piece of jade')\
@@ -917,7 +917,7 @@ Through the windshield, you see ($itemLinkAlias:'a little brown-colored lizard',
 <!--TODO See Middle of Nowhere for more description based on light and first time etc.-->
 
 
-:: open desert {"position":"1200,100","size":"100,100"}
+:: open desert {"position":"325,225","size":"100,100"}
 <!-- Open Desert creates a randomly changing description of the
 desert to provide the player the impression of wandering through
 the desert for an indeterminate time. 
@@ -1006,7 +1006,7 @@ Some crazy thrill comes over you. You feel like a hunter. You can almost smell t
 
 
 
-:: outside your truck [Tower-Vicinity Around-the-Tower] {"position":"525,825","size":"100,100"}
+:: outside your truck [Tower-Vicinity Around-the-Tower] {"position":"525,950","size":"100,100"}
 # Looking around
 The tire tracks [[from the south->backtracking]] stop abruptly here, but where the hell are you? The desert sand and clumps of pale sagebrush are all your dimming headlights pick out before barely reaching the concrete building to [[the north->crumbling concrete]].
 
@@ -1129,7 +1129,7 @@ A ($itemLinkAlias:'brown-colored lizard', 'a brown lizard') clings to a tall Sag
 ]))
 
 
-:: pursuit {"position":"1075,100","size":"100,100"}
+:: pursuit {"position":"200,225","size":"100,100"}
 (set: _showPursuit to (macro:[
   (if: $inPursuit is not true)[(out-data:false)]
   (if: (passage:)'s tags does not contain 'Around-the-Tower')[(out-data:false)]
@@ -1152,7 +1152,7 @@ A ($itemLinkAlias:'brown-colored lizard', 'a brown lizard') clings to a tall Sag
 ]]
 
 
-:: report lighter [fixed-in-place] {"position":"575,950","size":"100,100"}
+:: report lighter [fixed-in-place] {"position":"575,1075","size":"100,100"}
 ($clearItemHistory:)(set: _litBy to ($locationIsLit:))\
 (set: _loc to (passage:)'s name)\
 (unless: ($inventory:) contains 'a lighter')[
@@ -1168,7 +1168,7 @@ You pat your pockets, but can't seem to find your lighter.
 You flick it open and shut a few times, an old habit.]
 
 
-:: report smoking [fixed-in-place] {"position":"450,950","size":"100,100"}
+:: report smoking [fixed-in-place] {"position":"450,1075","size":"100,100"}
 <!-- clearItemHistory so that clicking Done takes you to the passage, not back to the glove box or wherever you started -->\
 ($clearItemHistory:)\
 (set: _reportLight to (macro:[
@@ -1218,14 +1218,14 @@ Well, you're still stuck here. [(_reportLight:)] Maybe [(_hint:)].
 And you still haven't quit smoking. (if:$cigs is 0)[That was your last cigarette, too.](else:)[You've got (plural:$cigs, "cig", "cigs") left.]
 
 
-:: road trips through the desert [memory] {"position":"1075,325","size":"100,100"}
+:: road trips through the desert [memory] {"position":"950,450","size":"100,100"}
 ## Road trips through the desert
 Always a faint whiff of gas in your truck, even on the highway at midnight with the windows cranked and scorching summer air sending Ocean's hair twisting and curling behind the passenger seat. The two of you driving through the night to visit her aunt in Santa Rosa, about a week before it happened, talking and laughing and sometimes her hand on your leg and sometimes your hand on hers, nothing alive but you and her and the truck and the road and the blackness beyond.
 
 Then all quick she leans forward at a green phantom roadsign and goes hey look, it's the road to Nakaibito! And you have no idea what she's talking about till you remember the story (and that you told her the story) and she says come on, let's go, let's find out what's there. And you're like what, now? And she laughs and says when else? And it's crazy and you tell her it's crazy, it'd be like a four hour drive there and four hours back, totally out of your way and probably for nothing, a couple trailers and broken glass, and you pass the exit and drive on and tease her a little but inside you're thinking, this is why I love her (if I do), that crazy, that what-the-hell let's do something wild and go with it spark, that's Ocean. That's your girl. And maybe you should have done it because now maybe your days of crazy gambling road trips are over, and maybe you'll never find out what's in Nakaibito or anywhere else.
 
 
-:: roof [Around-the-Tower Tower-Vicinity] {"position":"875,450","size":"100,100"}
+:: roof [Around-the-Tower Tower-Vicinity] {"position":"875,575","size":"100,100"}
 ## Roof
 From the roof of the building, you can see the huge electrical tower rising up in front of you. At your feet is the way [[back down->storage room]].
 
@@ -1237,7 +1237,7 @@ The (link-show:'metal rungs', ?metal-rungs) once led to a control booth higher u
 ($youCanAlsoSee:)
 
 
-:: sinister radio {"position":"1450,225","size":"100,100"}
+:: sinister radio {"position":"575,225","size":"100,100"}
 (if: $sinisterRadio > 0 and (passage:)'s name is 'break room')[\
 (set: _plansRequire to (ds:'emergency blanket', 'canned oranges', 'a gas can', 'a roll of duct tape'))\
 (set: _neededForPlan to ($dsIntersection: _plansRequire, (ds:...($inventory:))))\
@@ -1282,7 +1282,7 @@ The (link-show:'metal rungs', ?metal-rungs) once led to a control booth higher u
 ]
 
 
-:: smell of sage [fixed-in-place] {"position":"1325,225","size":"100,100"}
+:: smell of sage [fixed-in-place] {"position":"1200,350","size":"100,100"}
 ($first: "sage")[\
 ($moveToLoc: 'watching Family Guy with Karl', 'emotional baggage')]\
 ## Sage
@@ -1293,7 +1293,7 @@ It's been all around you this whole time but the rain has really brought the sce
 Something about smelling the sage makes you brood about ($itemLink:'watching Family Guy with Karl').
 
 
-:: staging area [Tower-Vicinity Office-Interior] {"position":"625,575","size":"100,100"}
+:: staging area [Tower-Vicinity Office-Interior] {"position":"625,700","size":"100,100"}
 ($lastVisitedWas:'crumbling concrete')[\
 (if: $rainstorm > 0)[\
 Gratefully, you slip inside the building, out of the storm.](else:)[\
@@ -1315,7 +1315,7 @@ The floor has half-collapsed near one corner, revealing ($itemLink:'a hole') cri
 ($youCanAlsoSee:)]
 
 
-:: storage room [Tower-Vicinity Office-Interior] {"position":"750,450","size":"100,100"}
+:: storage room [Tower-Vicinity Office-Interior] {"position":"750,575","size":"100,100"}
 (set: _litBy to ($locationIsLit:))\
 (set:_noLuck to (macro: [
 (out:)[You pull down a can from the shelf, grip it with the rusty can opener, and peel open the lid. Yuck: (either:'moldy peas','rotten condensed milk','black and mold-covered mushrooms','something nasty-smelling and green'). (either:'Just your luck.','Not your lucky day.','Some of these should still be good, right?')]
@@ -1349,7 +1349,7 @@ Near some rows of crumbling shelving supporting hundreds of dusty \
 ($youCanAlsoSee:)
 
 
-:: temptation {"position":"1450,100","size":"100,100"}
+:: temptation {"position":"700,225","size":"100,100"}
 (if: $rainstorm is -1 and 
 (history:) contains 'Control Center' and 
 (passage:)'s tags does not contain 'Office-Interior')[\
@@ -1358,7 +1358,7 @@ Near some rows of crumbling shelving supporting hundreds of dusty \
 ]
 
 
-:: test {"position":"200,450","size":"100,100"}
+:: test {"position":"1050,950","size":"100,100"}
 ($addToInventory: 'a pack of cigarettes')\
 ($addToInventory: 'a piece of jade')\
 (set: $foundAnimals to (ds:'lizard, brown'))\
@@ -1413,7 +1413,7 @@ Near some rows of crumbling shelving supporting hundreds of dusty \
 ]
 
 
-:: the burrow {"position":"1325,100","size":"100,100"}
+:: the burrow {"position":"450,225","size":"100,100"}
 (set: $itemIsDroppable to (macro: str-type _item, [
   (out-data:false)<!-- nothing droppable in burrow -->
 ]))\
@@ -1524,7 +1524,7 @@ The rabbit nods. "Yes," he says, "a fair trade." And something happens inside yo
 ]
 
 
-:: the last day of high school [memory] {"position":"700,325","size":"100,100"}
+:: the last day of high school [memory] {"position":"575,450","size":"100,100"}
 (set: $broodedMemories to it + (ds:"the last day of high school"))\
 ### The last day of high school
 You didn't expect it was going to be your last day. But that morning you got called in to the principal's office and fat bald Mr. Cox and pissy old Mrs. Burke were there, and they looked kind of like strong animals stalking weak animals, and you knew something bad was up.
@@ -1534,14 +1534,14 @@ Cox said I have here, Mr. Morales (a bad start since you hate that name) a test 
 No. They knew you cheated, deep in their smug empty hearts. They wanted you to admit it, say you were a cheater and a liar. But you weren't. You wrote that essay, every god damn word, because you really really liked the book for once and wanted to show Mrs. Burke that maybe if they gave people better books to read kids would actually learn something. But they wanted a confession. They wanted a thieving example they could parade in front of the school. Someone of your academic and behavioral and economic and racial background and yeah, screw this shit. So you got up and left and never came back. Drop out, hell. You walked out and you'd do it again.
 
 
-:: watching Family Guy with Karl [memory] {"position":"1325,325","size":"100,100"}
+:: watching Family Guy with Karl [memory] {"position":"1200,450","size":"100,100"}
 ## Watching Family Guy with Karl
 Whatcha watchin, Knock? he asked, lurching out of mom's room smelling of sage incense and holding a beer and crashing into the lazyboy, and you said Nothing Mr Morales (and god damn it kid, can't you at least call me Karl if you won't call me dad? but that conversation's been buried a year now at least out loud) and he squinted and said is this that Family Guy crap? I thought your mother said she didn't want you watching this crap (because it's always mother who wants you to do things or be things or say things, never Mr Morales) I thought your mother said you ought to start learning about your culture. 
 
 So while Peter is trying to start a rock band or something Karl starts spouting some story about Mexican myths with eagles and feathered serpent gods, and he must be so into the stepdad thing he's forgotten that's his culture, not yours (well, sort of). Not that your real dad or Peter Griffin ever helped you figure out what your culture's supposed to be either. It hits you that your culture must be somewhere in the middle, between Family Guy and Quetzalcoatl, and you start laughing and get grounded because you can't even imagine what the middle between those two could possibly look like.
 
 
-:: weather {"position":"950,100","size":"100,100"}
+:: weather {"position":"1075,100","size":"100,100"}
 (if: $rainDescriptions is not an array)[\
   (set: $rainDescriptions to (shuffled: 
   "The building groans as wind and rain lash it from outside.",
@@ -1575,7 +1575,7 @@ So while Peter is trying to start a rock band or something Karl starts spouting 
 ]
 
 
-:: weed strewn rust [Around-the-Tower Tower-Vicinity] {"position":"650,700","size":"100,100"}
+:: weed strewn rust [Around-the-Tower Tower-Vicinity] {"position":"650,825","size":"100,100"}
 #Weed-strewn Rust
 Behind the rather small concrete building and its tiny frosted window is nothing but a scraggly patch of yellowing weeds and dirt near a leaking pipe, littered by a collection of rusted barrels and some scattered newspapers. Desert stretches in all directions; [[back west->crumbling concrete]] is the front of the building.
 
@@ -1589,7 +1589,7 @@ Behind the rather small concrete building and its tiny frosted window is nothing
 ($youCanAlsoSee:)
 
 
-:: when you heard the news [memory] {"position":"575,325","size":"100,100"}
+:: when you heard the news [memory] {"position":"450,450","size":"100,100"}
 (set: $broodedMemories to it + (ds:"when you heard the news"))\
 ### When you heard the news...
 Four weeks ago now, a little colder and a little darker. On a night just like this one except you didn't drive off the road and crash into a cactus, you got off work and drove the state highway in the dark and crossed over the edge of the res to Ocean's dad's trailer, and she told you that night while you were dead exhausted, "Knock, I'm pregnant."
@@ -1601,7 +1601,7 @@ Ocean's aunt is paying for the baby but it's been made clear the money stops whe
 "But decide soon, Knock. Decide soon."
 
 
-:: your shit job [memory] {"position":"450,325","size":"100,100"}
+:: your shit job [memory] {"position":"325,450","size":"100,100"}
 (set: $broodedMemories to it + (ds:"your shit job"))\
 ### Your shit job
 Juza straddles the 371 like a drunk at last call, smelly and without a plan for the future. Shiny cars whiz by at ninety once in a while, only stopping for gas or directions (hint\: not this way). No one ever stops for the stalls selling food and jewelry and blankets and cheap t-shirts that cluster around the dirt turn-off onto the rez. At least, no one buying anything.
