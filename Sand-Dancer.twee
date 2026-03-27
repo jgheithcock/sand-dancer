@@ -117,7 +117,7 @@ You don't know what's going to happen now.
   (out:)[_out]
 ]))\
 <!-- For trading memories for talents -->
-(set:$memoryList to (macro: str-type _talent, str-type _hook, [
+(set:$memoryList to (macro: str-type _talent, macro-type _onDone, [
   (set:$tradeFor to _talent)
   (set:$dramaticScene to false)
   (set: _tradeLink to (macro: str-type _item, [
@@ -126,7 +126,7 @@ You don't know what's going to happen now.
         (set: $memoryToTrade to _item)\
         ($removeFromGame: _item)\
         (set: $talents to it + (ds:$tradeFor))\
-        (show:(hooks-named:_hook))\
+        (_onDone:_item, _talent)\
       ]\
     ]
   ]))
@@ -228,6 +228,15 @@ You don't know what's going to happen now.
   ](else:)[
     (out-data:'dark')
   ]
+]))\
+(set: $readyForSandDancer to (macro: [
+  <!-- ready if have two items needed for any plan
+  and have 3+ memories -->
+  (set: _planItems to ($inventoryWithTag:'plan-item'))
+  (out-data:_planItems's length > 1 and ($itemsIn:'emotional baggage')'s length > 2)
+]))\
+(set: $exitWindowLink to (macro: [
+  (if:($readyForSandDancer:))[(out-data:'staging area-sand dancer')](else:)[(out-data:'crumbling concrete')]
 ]))
 
 
@@ -418,8 +427,8 @@ Most of the pages are faded or worn away, but flipping through, it looks like a 
 
 Bolted to the wall, it looks like one of those 'break-in-case-of-emergency' things. You can see a (link-reveal:'blanket')[(hide: ?take-blanket)(show: ?take-blanket)] in it.
 |take-blanket)[\
-(if: $talents contains 'strength')[You grip the mesh in one hand and pull, and realize it's so rusted you can easily peel it back. The door rips free and you drop it to the floor. The ($itemLinkAlias:'blanket', 'emergency blanket') is yours.\
-($addToInventory:'emergency blanket')\
+(if: $talents contains 'strength')[You grip the mesh in one hand and pull, and realize it's so rusted you can easily peel it back. The door rips free and you drop it to the floor. The ($itemLinkAlias:'blanket', 'an emergency blanket') is yours.\
+($addToInventory:'an emergency blanket')\
 ($removeFromGame: 'a wire mesh cage')\
 ($clearItemHistory:)\
 ]\
@@ -430,6 +439,11 @@ You sling the key into the lock, but as you turn it, the rusted metal snaps off 
 The cage seems to be locked.\
 ]\
 ]
+
+
+:: an emergency blanket [fixed-in-place plan-item plan-staying-the-night] {"position":"900,825","size":"100,100"}
+## An emergency blanket
+Hey, that emergency blanket might be useful if you decide on spending the night here.
 
 
 :: an emergency radio [fixed-in-place] {"position":"875,700","size":"100,100"}
@@ -558,6 +572,22 @@ Shadows and grime linger in dark corners of this dismal room with just one tiny 
 ($youCanAlsoSee:)
 
 
+:: break room-sand dancer {"position":"1250,700","size":"100,100"}
+(hide:?Sidebar)\
+(set: $dramaticScene to true)\
+($first:'break-room-sand-dancer')[You wade through the sand, which is rising all the time.
+
+]\
+### Break Room
+The deluge of sand thunders in from every side, filling the room.
+
+You glance wildly at the exits (link-goto:"north to the storage room",'storage room-sand dancer') and (link-show:"west back to the staging area", ?staging); the emergency radio tumbles in the flow.
+
+The building shakes and groans as sand continues to pour in, rising higher and higher.
+
+|staging)[You glance back but the sand has already started to pour through the door into the room.]
+
+
 :: break the window [fixed-in-place] {"position":"400,825","size":"100,100"}
 (set:_itemsToTry to (macro:[
   (set:_heavyLink to (macro:str-type _item, [
@@ -593,11 +623,6 @@ You pat down your pockets. Maybe you could throw something?
 You step back and throw $heavyItem at the window, it smashes through, shattering it.($moveToLoc: $heavyItem, 'staging area')(set:$windowBroken to true)(set: $goToOnDone to 'crumbling concrete')]
 
 
-:: canned oranges [plan-item plan-staying-the-night] {"position":"825,350","size":"100,100"}
-## Canned Oranges
-You won't be hungry again till morning. 
-
-But thinking about oranges reminds you of ($itemLink:'Ocean\'s perfume').
 
 
 :: coyote offer {"position":"825,225","size":"100,100"}
@@ -765,7 +790,16 @@ what you're trying to do."
 |make-deal)[=\
 (hide: ?coyote-trade)\
 "What is the first memory you will trade me for $tradeFor?"
-|first-trade>[($memoryList:$tradeFor, 'next-memory')]\
+
+(set:_showNext to (macro: str-type _m, str-type _t, [
+  (show:?next-memory)
+  (out-data:'')
+]))\
+(set:_showFairTrade to (macro: str-type _m, str-type _t, [
+  (show:?fair-trade)
+  (out-data:'')
+]))\
+|first-trade>[($memoryList:$tradeFor, _showNext)]\
 |next-memory)[=\
 (hide: ?coyote-trade)\
 (hide: ?first-trade)\
@@ -778,7 +812,8 @@ although it's not enough to complete the trade."
 Somewhere inside you, things are shifting, moving, growing.
 
 "What is the other memory you will trade me for $tradeFor?"
-|second-trade>[($memoryList:$tradeFor, 'fair-trade')]
+
+|second-trade>[($memoryList:$tradeFor, _showFairTrade)]\
 |fair-trade)[=\
 (hide: ?second-trade)\
 You offer to trade your memory of $memoryToTrade for $tradeFor.
@@ -804,7 +839,7 @@ Remember the shadows."
 And it seems like he's growing, larger and larger, the red \
 tip of his cigarette pulsing and glowing now high up in the \
 sky, and you stumble back, shivering, and suddenly remember \
-your flashlight in your hand and (link-goto:'switch it on', 'base of tower')..."\
+your flashlight in your hand and (link-goto:'switch it on', 'base of tower')...\
 (set:$flashlightOn to true)\
 ]
 
@@ -826,9 +861,14 @@ This concrete building must've been some sort of utility structure for the [[hug
 ($youCanAlsoSee:)
 
 
-:: emergency blanket [fixed-in-place plan-item plan-staying-the-night] {"position":"900,825","size":"100,100"}
-## Emergency blanket
-Hey, that emergency blanket might be useful if you decide on spending the night here.
+:: crumbling concrete-sd {"position":"1250,1075","size":"100,100"}
+(hide: ?Sidebar)\
+(set: $dramaticScene to true)\
+And then, just as quiet settles, another huge rumble shakes the ground, and, almost like an afterthought, the building breaches the sand and rises to the surface
+# Crumbling Concrete
+This concrete building must've been some sort of utility structure for the huge electrical tower to the north, now abandoned. The empty frame of a window [[leads inside->you go]]. Tendrils of desert sand drift against a [[boarded-up door->you go]] to the northeast.
+
+You could [[walk around to the east->you go]] or [[head south back to your truck->you go]].
 
 
 :: emotional baggage [fixed-in-place] {"position":"950,100","size":"100,100"}
@@ -1011,6 +1051,18 @@ And that was maybe you think the first time she said she loved you, and you said
 ]))\
 (set: $inventory to (macro: [
   (out-data: ($itemsAt)'s 'inventory')
+]))\
+(set: $itemsInWithTag to (macro: str-type _loc, str-type _tag, [
+  (set: _items to ($itemsIn: _loc))
+  (out-data:(find: where (passage: it)'s tags contains _tag, ..._items))
+]))\
+(set: $inventoryWithTag to (macro: str-type _tag, [
+  (out-data:($itemsInWithTag:'inventory', _tag))
+]))\
+(set: $allWithTag to (macro: str-type _tag, [
+  (set: _itemsWithTag to (passages: where its tags contains _tag))
+  (set: _onlyNames to (altered: via its name, ..._itemsWithTag))
+  (out-data: _onlyNames)
 ]))\
 (set: $itemsIn to (macro: str-type _loc, [
   (unless: $itemsAt contains _loc)[(set: $itemsAt to it + (dm: _loc, (a:)))]
@@ -1543,9 +1595,233 @@ The metal rungs have rusted away and crumbled; the lowest are well above your he
 ($youCanAlsoSee:)
 
 
+:: roof-sand dancer {"position":"1250,950","size":"100,100"}
+(hide: ?Sidebar)\
+(set: $dramaticScene to true)\
+(set: $spendNight to "spending the night here")\
+(set: $fixTruck to "fixing your truck and getting out of here")\
+(set: _planItems to ($inventoryWithTag:'plan-item'))\
+(set:_claimItem to (macro: str-type _wanted, str-type _unwanted, [
+  ($addToInventory:_wanted)
+  (if: (passage:_wanted)'s tags contains 'plan-staying-the-night')[
+    (set: $thePlan to $spendNight)
+  ](else:)[
+    (set: $thePlan to $fixTruck)
+  ]
+  (set: $wanted to _wanted)
+  (set: $unneeded to _unwanted)
+  ($removeFromGame: $unneeded)
+  (show: ?report-taking)
+  (out-data:'')
+]))\
+(set: _unclaimedItems to (macro:[
+  <!-- unclaimed is all possible plan items you don't have -->
+  (set: _unclaimed to ($allWithTag:'plan-item') - ($inventory:))
+  (set: _claimLink to (macro: str-type _wanted, str-type _unwanted, [
+    (out:)[(link-repeat:_wanted)[(_claimItem: _wanted, _unwanted)]]
+  ]))
+  (set: _one to _unclaimed's 1st)
+  (set: _two to _unclaimed's 2nd)
+  (out:)[(_claimLink:_one, _two) and (_claimLink:_two, _one)]
+]))\
+(set: _stayTheNight to ($inventoryWithTag:'plan-staying-the-night')'s length is 2)\
+(set: _fixTruck to ($inventoryWithTag:'plan-fixing-the-truck')'s length is 2)\
+(set: $thePlan to "undecided")\
+(if: _stayTheNight)[(set:$thePlan to $spendNight)]\
+(if: _fixTruck)[(set:$thePlan to $fixTruck)]\
+(set: _talentSummary to (macro:[
+  (set: _t to "")
+  (if: $talents contains 'strength')[(set:_t to it + "You carry strength that ripped warmth from walls. ")]
+  (if: $talents contains 'courage')[(set:_t to it + "You hold courage that earned you a tool for mending. ")]
+  (if: $talents contains 'luck')[(set:_t to it + "You wear luck that filled your belly. ")]
+  (if: $talents contains 'scent')[(set:_t to it + "You have scent that brought you liquid motion. ")]
+  (out-data: _t)
+]))\
+(set: _sdBusiness to (a:
+  "and his voice shakes the earth and creaks the rusty joints of the tower",
+  "flicking his tongue in and out, slowly",
+  "his great slitted eye blinking slowly",
+  "sighing as the lizards in the desert writhe and twitch"
+))\
+Barely able to reach the ladder through sand up to your waist, you haul yourself up the rungs and pull free just in time.
+
+### Roof
+Except it's more like a foundation now, the building's sunken almost entirely into the sand.
+
+The sand swirls and churns like something liquid or alive around you, and then you look and see it is alive, thousands and thousands of lizards, little sand-dancers, are burrowing up from somewhere underground, scattering and writhing in some complex pattern in a huge circle all around you.
+
+Then, suddenly, everything stops.
+
+And with a mighty heave, a huge (link-show:'lizard', ?sand-dancer) crests through the sand right in front of you.
+
+|sand-dancer)[=\
+His scales are thick, sand still spilling off them in rivulets and trickles, and they recede and collide in fractal complexities that make you dizzy. He rumbles somewhere inside him, and the sand jitters at his feet.
+
+The lizard's tongue snakes through the air, tasting it, tasting you. One slitted eye studies you intently. It pauses, as if waiting for you to say something.
+
+|could-about-hello>[//You could //(link-show:'say hello', ?say-hello)// or you could// (link-show:'ask him about himself', ?about-sand-dancer)
+
+]\
+|say-hello)[\
+(hide: ?could-about-hello)\
+The ground rumbles as the lizards shift. "Hello," he says, ($oneOfCycling:_sdBusiness). "Yes, hello, little one. Strange thing to say when I've always been with you, watching, waiting. But hello, hello at last, Nakaibito."
+
+|could-about>[//You could // (link-show:'ask him about himself', ?about-sand-dancer)
+
+]]\
+|about-sand-dancer)[=\
+(hide: ?could-about-hello)\
+(hide: ?could-about)\
+"I am Sand-dancer," he breathes, ($oneOfCycling:_sdBusiness). "I am the desert and the dust and the rain and the wind. I was there the first time you went hungry and the first time you made love and the last time you asked for help, but I could not help you then. But tonight, Nakaibito, tonight I can."
+
+|path-selection)["Much has happened tonight. You've made bargains and plans. (_talentSummary:)But these things together do not help you. No, you still haven't decided." The lizard stares at you with one eye, ($oneOfCycling:_sdBusiness). "But now is the time."
+
+|ground-shudders>[The ground shudders and shifts beneath you, and out of the sand rise (_unclaimedItems:).
+
+]\
+"The tape and the gas can will return you to her. The blanket and the can of food will look out for you. Take one."
+
+|report-taking)[As you take $wanted, $unneeded sinks into the sand.
+
+(hide:?ground-shudders)\
+(show:?finish-choice)]\
+]\
+|finish-choice)["By your actions and through your talents, you have chosen $thePlan," he says, ($oneOfCycling:_sdBusiness). "You have looked into yourself and found your story, the path you will walk tomorrow."
+
+He breathes. "And are you happy with your story?" he asks, and there's some dangerous undertone to the question and you don't know why. The lizards tense, quivering, twisting their little heads back and forth as they await your answer.
+
+(if: $thePlan is $spendNight)[\
+  (set:$talent to 'spirit')\
+](else:)[\
+  (set:$talent to 'honor')\
+]\
+|happy-or-not>[//You could say //(link-show:'yes', ?yes-happy)// or //(link-show:'no', ?not-happy)// or tell him //(link-show:"you're not sure if you're happy", ?not-sure).
+
+]]\
+|yes-happy)["Yes?" Sand-dancer says, and the lizards quiver anxiously. "You're happy with the path you've chosen? (show:?sd-tease)]\
+|not-happy)["No?" Sand-dancer says, and the lizards quiver anxiously. "You're not happy with the path you've chosen? (show:?sd-tease)]\
+|sd-tease)[(if: $thePlan is $spendNight)[A life on the run, alone, work time in one town, jail time in another, no job, no skills, no family?" ](else:)[Trying to build a family out of nothing, spin futures from government handouts and dusty trailer parks, raising another generation of hopeless dropouts and messed-up losers?" ]\
+The lizards scurry angrily, snapping and clawing at each other, with a sound like static and sand.
+
+"It doesn't matter," he says more calmly, as the lizards subside, "since you have already made your choice. You cannot take back your actions. You cannot unmake the past." The lizards around him tilt their head, edge forward cautiously, and he seems to grin. "But I can."
+
+(show:?doing-the-trade)\
+]\
+|not-sure)[The lizard turns his head sharply, and all the lizards in the desert around writhe angrily, clawing and biting at each other in agitation. "And when will you know, Knock?" the lizard asks. "When will you own your life? When will you become a man? Tonight. It must be tonight."
+
+(show:?doing-the-trade)(hide:?happy-or-not)\
+]\
+|doing-the-trade)[\
+(hide:?happy-or-not)\
+A glistening egg rises from the sand, glowing with neon potential, and the lizard glances down at it almost dismissively. "This is $talent," he says, "the last talent you need to achieve your goal, and you can have it for three memories. But perhaps I have something else to trade."
+
+The lizards whisper in anticipation as a second egg rises. This one's bigger, and almost blinding with its intensity, and the lizards draw back, chittering in awe and amazement. "This," Sand-dancer says, "is freedom. Pure, undiluted, and absolute. Many crave it and few get a chance to take it. I offer it to you, Nakaibito, but it does not come cheaply." He grins. "For freedom, you must give up everything. You must give me all your memories."
+
+The lizards begin to circle restlessly as they wait for you to choose. Sand-dancer merely watches, and waits.
+
+|ask-about-spirit)[(hide:?could-spirit)\
+You ask the Sand-dancer about spirit.
+
+"You have the warmth and energy you need to stay through the night," he says, "but to continue looking out for yourself, you will need spirit."
+
+]\
+|ask-about-honor)[(hide:?could-honor)\
+You ask the Sand-dancer about honor.
+
+"You have the tools to fix your truck," he says, "but to return to Ocean and stand by her side you will need honor."
+
+]\
+|ask-about-freedom)[(hide:?could-freedom)\
+You ask the Sand-dancer about freedom.
+
+"With freedom, Nakaibito, you can make your troubles vanish. True freedom is the power of unmaking the past, of undoing what's done and regretted. This power is great and terrible, but I promise you." He flicks his tongue. "It will set you free."
+
+]\
+|sd-topics>[\
+//You could://
+(if: $thePlan is $spendNight)[\
+|could-spirit>[$tab - (link-show:"ask about spirit", ?ask-about-spirit)
+]\
+$tab - (link-repeat:"trade for spirit")[(set: $tradeFor to 'spirit')(show: ?make-deal)]
+](else:)[\
+|could-honor>[$tab - (link-show:"ask about honor", ?ask-about-honor)
+]\
+$tab - (link-repeat:"trade for honor")[(set: $tradeFor to 'honor')(show:?make-deal)]
+]\
+|could-freedom>[$tab - (link-show:"ask about freedom", ?ask-about-freedom)
+]\
+$tab - (link-repeat:"trade for freedom")[(set: $tradeFor to 'freedom')(show: ?make-deal)]
+
+]\
+]<!-- sd-topics -->\
+(if:$thePlan is "undecided")[(show:?path-selection)\
+](else:)[(show:?finish-choice)]\
+(set: $sdResponse to (macro: str-type _memory, [
+  (set: _loc to (either:"your head",
+    "your heart",
+    "your gut",
+    "your palm",
+    "your core",
+    "your soul"))
+  (set: _more to ($oneOfStopping:(a:
+    '"A good start," he says, "but you must trade more."',
+    '"Yes," he says, "but more."',
+    '"More," he says.',
+    '"Still more," he says.',
+    '"I must have more," he says.',
+    '"Give me more," he says.'
+  )))
+  (out:)[He flicks out his tongue and pulls _memory from _loc, swallowing it whole. _more
+
+]
+]))\
+|make-deal)[\
+(set: _allMemories to ($itemsIn:'emotional baggage')'s length)\
+(set: $cost to 3)\
+(if: $tradeFor is 'freedom')[(set: $cost to _allMemories)]\
+(hide:?sd-topics)\
+|trade-report>[\
+"What memory will you first trade me for $tradeFor?"
+
+]\
+(set: _tradedMemory to (macro: str-type _m, str-type _t, [
+  <!-- called for each memory traded -->
+  (set: $cost to it - 1)
+  (if: $cost > 0)[
+    (append:?trade-report)[($sdResponse:_m)]
+  ](else:)[
+    (set: $memoryTraded to _m)
+    (set: $talents to it + (ds:_t))
+    (show:?final-response)
+    (hide: ?memory-list)
+  ]
+  (out-data:'')
+]))\
+|memory-list>[($memoryList:$tradeFor, _tradedMemory)
+
+]\
+]\
+|final-response)[\
+Sand-dancer nods. "Yes," he says, "a fair trade." And something \
+happens inside you as he says it. The memory of $memoryTraded \
+shifts and wriggles and fades away and it's still there, but \
+now it's shifted, become something else. And yeah, it kinda does \
+feel like you could call it $tradeFor. Cool.
+
+"The choice is made," he rumbles, "your path is set. \
+Goodbye, Nakaibito." And he turns and dives into the sand. \
+The lizards twist and writhe and follow him.
+
+And then, just as quiet settles, another huge rumble shakes \
+the ground, and, almost like an afterthought, the building \
+breaches the sand and [[rises to the surface ->crumbling concrete-sd]].
+
+]
+
+
 :: sinister radio {"position":"575,225","size":"100,100"}
 (if: $sinisterRadio > 0 and (passage:)'s name is 'break room')[\
-(set: _plansRequire to (ds:'emergency blanket', 'canned oranges', 'a gas can', 'a roll of duct tape'))\
+(set: _plansRequire to (ds:...($allWithTag:'plan-item')))\
 (set: _neededForPlan to ($dsIntersection: _plansRequire, (ds:...($inventory:))))\
 (set: _talents to (a:...($talents)))\
 (set: _radioLeftOff to "")\
@@ -1599,6 +1875,13 @@ It's been all around you this whole time but the rain has really brought the sce
 Something about smelling the sage makes you brood about ($itemLink:'watching Family Guy with Karl').
 
 
+:: some canned oranges [plan-item plan-staying-the-night] {"position":"825,350","size":"100,100"}
+## Canned Oranges
+You won't be hungry again till morning. 
+
+But thinking about oranges reminds you of ($itemLink:'Ocean\'s perfume').
+
+
 :: staging area [Tower-Vicinity Office-Interior] {"position":"625,700","size":"100,100"}
 ($lastVisitedWas:'crumbling concrete')[\
 (if: $rainstorm > 0)[\
@@ -1621,6 +1904,38 @@ The floor has half-collapsed near one corner, revealing ($itemLink:'a hole') cri
 ($youCanAlsoSee:)]
 
 
+:: staging area-sand dancer {"position":"1250,575","size":"100,100"}
+(hide:?Sidebar)\
+(set: $dramaticScene to true)\
+($first:'sand-dancer-arrival')[\
+You start to go out, but then you stop. Something's not right. Something's... weird.
+
+There's like this faint tickle through the soles of your feet, some vibration, almost like whispers in the sand. You want to bend down, put your ear to the ground, listen forever.
+
+And then the ground drops out from under you, heaves, and drops again. Struts groan and boards snap and then with a whooshing bang sand starts pouring in through the window and every crack, jets of sand, and already it's shin-deep and holy christ you've got to get out of here.
+
+The building shakes and groans as sand continues to pour in, rising higher and higher
+
+]\
+## Staging Area
+Waves of sand flow like water through the room, filling it higher and higher.
+
+The floor has half-collapsed near one corner.
+
+You can also see a metal desk here.
+
+You glance wildly at the exits (link-show:"north, to the foreman's office",?foremans) (link-goto:"east to the break room", 'break room-sand dancer') and the (link-show: "window frame leading outside", ?window); the metal desk vanishes under the sand.
+
+The building shakes and groans as sand continues to pour in, rising higher and higher.
+
+|foremans)[You start for the foreman's office but before you can take a step you see sand pouring out of the tiny window, rapidly filling the office and covering all contents.
+
+]\
+|window)[A mountain of sand is pouring in through the open window frame, there is no exit there!
+
+]
+
+
 :: storage room [Tower-Vicinity Office-Interior] {"position":"750,575","size":"100,100"}
 (set: _litBy to ($locationIsLit:))\
 (set:_noLuck to (macro: [
@@ -1634,7 +1949,7 @@ casting strange patterns of shadow as you sweep your flashlight beam around.]\
 The [[break room]] lies back to the south and a [[utility ladder->roof]] climbs through a broken skylight to the roof.
 
 Near some rows of crumbling shelving supporting hundreds of dusty \
-(if:($itemLoc:'canned oranges') is 'offstage')[\
+(if:($itemLoc:'some canned oranges') is 'offstage')[\
 (link-show:'cans of food', ?cans-of-food) \
 ](else:)[cans of food] \
 (if: $emergencyLightsOn)[there is](else:)[you spot a dark] ($linkRevealPersist:'a control panel',[(show:?emergency-lights)]) for the building's emergency lights.
@@ -1653,6 +1968,25 @@ Near some rows of crumbling shelving supporting hundreds of dusty \
 [<tw-consecutive-br/>With a sharp buzz, a whiff of static and an electrical groan, bare light bulbs flicker on throughout the building.
 ]]\
 ($youCanAlsoSee:)
+
+
+:: storage room-sand dancer {"position":"1250,825","size":"100,100"}
+(hide:?Sidebar)\
+(set: $dramaticScene to true)\
+Knee-deep sand fills the room, rising at a terrifying rate.
+
+### Storage Room
+Near some rows of crumbling shelving supporting hundreds of dusty cans of food is the control panel for the building's emergency lights.
+
+You see the rusted filing cabinet, pushed over by the sand.
+
+You glance wildly at the exits (link-show:"south to the break room",?break) and (link-goto:"up to the roof", 'roof-sand dancer'); the rows of crumbling shelving vanishes under the sand.
+
+You wade through the sand, which is rising all the time.
+
+The building shakes and groans as sand continues to pour in, rising higher and higher.
+
+|break)[The sand has already filled the break room and is pouring through the door.]
 
 
 :: temptation {"position":"700,225","size":"100,100"}
@@ -1768,6 +2102,53 @@ The distant figure waves again, \
   ($moveToLoc:'watching Family Guy with Karl', 'emotional baggage')\
   (go-to: 'coyote offer')\
 ]
+(link:"Sand Dancer Arrival")[\
+  (set: $emergencyLightsOn to true)\
+  (set: $conversationOver to true)\
+  (set: $inPursuit to false)\
+  (set: $memoryToTrade to 'You ain\'t seen nothing yet')\
+  (set: $tradeFor to 'scent')\
+  (set: $talents to it + (ds:'courage', 'scent'))\
+  (set: $rainstorm to -1)\
+  (set: $sinisterRadio to -1)\
+  (set: $inChase to false)\
+  (set: $temptation to -1)\
+  (set: $fightCoyotes to false)\
+  ($addToInventory:'a roll of duct tape')\
+  ($addToInventory:'a gas can')\
+  ($moveToLoc:'meeting Ocean', 'emotional baggage')\
+  ($moveToLoc:'watching Family Guy with Karl', 'emotional baggage')\
+  (go-to: 'base of tower')\
+]
+(link:"Sand Dancer")[\
+  (set: $emergencyLightsOn to true)\
+  (set: $conversationOver to true)\
+  (set: $inPursuit to false)\
+  (set: $memoryToTrade to 'You ain\'t seen nothing yet')\
+  (set: $tradeFor to 'scent')\
+  (set: $rainstorm to -1)\
+  (set: $sinisterRadio to -1)\
+  (set: $inChase to false)\
+  (set: $temptation to -1)\
+  (set: $fightCoyotes to false)\
+  (set: $talents to it + (ds:'courage'))\
+  ($addToInventory:'a roll of duct tape')\
+  (set: $talents to it + (ds:'scent'))\
+  ($addToInventory:'a gas can')\
+  <!--
+  (set: $talents to it + (ds:'luck'))\
+  ($addToInventory:'some canned oranges')\
+  (set: $talents to it + (ds:'strength'))\
+  ($addToInventory:'an emergency blanket')\
+  -->\
+  ($moveToLoc:"Ocean's perfume", 'emotional baggage')\
+  ($moveToLoc:"road trips through the desert", 'emotional baggage')\
+  ($moveToLoc:'your shit job', 'emotional baggage')\
+  ($moveToLoc:'the last day of high school', 'emotional baggage')\
+  ($moveToLoc:'meeting Ocean', 'emotional baggage')\
+  ($moveToLoc:'watching Family Guy with Karl', 'emotional baggage')\
+  (go-to: 'roof-sand dancer')\
+]
 
 
 :: the burrow {"position":"450,225","size":"100,100"}
@@ -1847,14 +2228,15 @@ The rabbit breathes and stares. You wonder if it's going to start talking like i
 |trade-for-strength)["Might be useful for surviving through the night," he says,"if that's what you're planning."
 
 "What memory will you trade me for strength?"
-($memoryList:'strength', 'fair-trade')\
+($memoryList:'strength', _showFairTrade)\
 ]\
 |trade-for-courage)["You're going to need it to get home to Ocean,' he says, 'if that's what you want."
 
 "What memory will you trade me for courage?"
-($memoryList:'courage', 'fair-trade')\
+($memoryList:'courage', _showFairTrade)\
 ]\
-|fair-trade)[(hide:?trade-for-strength)(hide:?trade-for-courage)\
+(set:_showFairTrade to (macro: str-type _m, str-type _t, [(show:?fair-trade)]))\
+|fair-trade)[(hide:?trade-for-strength)(hide:?trade-for-courage)(replace:?strength-and-courage)[Strength," he says, pointing to the first one, "and courage]\
 You offer to trade your memory of $memoryToTrade for $tradeFor.
 
 The rabbit nods. "Yes," he says, "a fair trade." And something happens inside you as he says it. Your memory of $memoryToTrade shifts and wriggles and fades away and it's still there, but now it's shifted, become something else. And yeah, it kinda does feel like you could call it $tradeFor. Cool.
@@ -1909,7 +2291,7 @@ So while Peter is trying to start a rock band or something Karl starts spouting 
     (str:(rotated: $rainstorm, ...$rainDescriptions)'s 1st)
     (set: $rainstorm to it + 1)\
   ]\
-](else-if: $dramaticScene is not true and (passage:)'s name is not 'open desert' and (random: 1, 1) is 1)[\
+](else-if: $dramaticScene is not true and (passage:)'s name is not 'open desert' and (random: 1, 4) is 1)[\
   <!-- Normal weather reporting -->\
   (either:
   "You shiver in the cold air.",
@@ -1942,6 +2324,32 @@ And all you could think was how totally not real it seemed, after an hour of bla
 Ocean's aunt is paying for the baby but it's been made clear the money stops when the baby's born. Ocean wants to keep it, she's always wanted to be a mommy. But you never thought you'd be a daddy. And when she pushed this into your hand last night she told you, "Knock, it's time to decide. If you aren't with me on this, if you don't want this as much as I do, then this can't go on anymore and you should go. Fly. Head west. Find Nakaibito." She smiled just a little and traced your ear.
 
 "But decide soon, Knock. Decide soon."
+
+
+:: you go {"position":"1125,1075","size":"100,100"}
+## You go...
+(hide: ?Sidebar)\
+(set: $dramaticScene to true)\
+(if: $tradeFor is "freedom")[\
+...with a strange, kinda tingly feeling in the backs of your hands and inside your eyes. You feel powerful, (if: $talents contains 'strength')[stronger than wind now](else-if:$talents contains 'courage')[braver than the sun now] and free, most of all free. You walk backwards across the sand to your truck, sucking up your footprints as you go, and slip behind the wheel. There's this crazy wrenching bang and you jerk backwards as the engine starts, uncrashing your pickup off the cactus and juddering back onto the highway, and you smile. You're going back, back to a second chance, back to make it all right.
+
+You speed up, drive backwards at a thousand miles an hour to work, and unfix junkers and repack parts in a flash, faster and faster. The days rewind like videotape, unwork, unsleep, giving back kisses from Ocean one by one(if: $talents contains 'scent')[, and the smell of the past unfurling is like wine and ozone]. And then it's that night, the night you made the Big Mistake(if: $talents contains 'luck')[ before your luck started turning around, yeah, cause](else:)[, but] this time you unmake love. And the moment unpasses and your future is safe and uncomplicated, no kid, no nightmares, no arguments, no lectures, and you just have to get this thing out of reverse now and do it right this time (or mebbe not at all, it's too hot anyway ya know babe?) and this time you'll make everything perfecto.
+
+But you don't turn around. You try, but it's kinda like trying to stop falling, and you suddenly get that you //are// falling, plummeting back faster and faster like you got pushed off the cliff of now. You're unmeeting Ocean and unditching school and unsmoking for the first time behind the dumpsters, faster and faster, stomach in your throat, memories blowing back your hair as they rocket past. You're a kid again unskateboarding and unlearning video game combos, screaming backwards faster and faster and you get it now, you get the lizard's joke. He's making you free by unmaking you, fixing the burden by erasing the guy who's bearing it, and you're unlearning to read and unlearning to walk and uncrawling and uncrying and then some brilliant moment of light and noise and chaos comes shrieking towards you hella fast, fast, faster than anything and it's too late, you're crashing, you're crashing, you crash...
+
+](else-if: $tradeFor is "spirit")[\
+...and the night collapses in on you so hard you barely remember curling up in a corner with the blanket(if:$talents contains 'courage')[, not afraid any more](else-if: $talents contains 'strength')[, strong enough now to wait out the night].
+
+In the morning some highway patrol dude shakes you awake with a lecture and a ride back to town. Oro Oeste? he asks but you tell him no, take a left instead, and you end up on a street corner in Pobre Vista and keep going. Seven Sticks and then Gallup and then Flagstaff, hitching west. The cash in your wallet runs out but a trucker buys you a value meal and (if: $talents contains 'luck')[with a little more luck you keep from being hungry](else-if: $talents contains 'scent')[you seem to have a knack for sniffing out enough to stay fed] and your blanket keeps you warm and you keep going.
+
+When you hit the Pacific you roll up your jeans and wade into the surf for the first time in your life. And it's warm on the top and cool underneath and this is all you want, this moment, this here and now. You'll find work and you'll find love but you'll never find home and that's okay. It's okay. You wade deeper and the waves lap higher and then a big one rolls in, blue and white, and you feel (if: $talents contains 'strength')[strong, strong](else:)[crazy brave] as it crests and smashes into you with the force of all the water in the world, and you laugh and try to stay on your feet but it's too late, you're crashing, you're crashing, you crash...
+
+](else:)[\
+...and the clouds are gone and the stars are so bright you squint. You patch the fuel line and refill the tank and she starts like a beauty, and then you're back on the highway again, headed for Ocean, (if: $talents contains 'luck')[and you've never felt luckier](else-if: $talents contains 'scent')[and the urge to breathe the same air as her leads you on like a bloodhound].
+
+You shut off the headlights as you pull up to the trailer, and climb in through her window for old times sake(if:$talents contains 'courage')[, crazy courage her sister at least appreciated if not her old man](else-if: $talents contains 'strength')[ even though you think you're finally strong enough to take her old man]. She's awake of course, always no matter how quiet you are, and she holds out a hand from somewhere under the blankets. And as she's doing it you're suddenly exhausted, beyond exhausted but also safe, warm even before you slip under the covers. She half turns to kiss you as you fumble with the blankets but you're so tired all you can do is push your face against her neck and slip an arm around her warm skin, and she starts to ask you something but it's too late, you're crashing, you're crashing, you crash...
+]\
+(align:"=><=")+(box:"X=")[//***The End ***//]
 
 
 :: your shit job [memory] {"position":"325,450","size":"100,100"}
