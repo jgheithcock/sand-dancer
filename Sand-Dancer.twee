@@ -21,7 +21,8 @@ Sand-Dancer
     "Around-the-Tower": "green",
     "plan-item": "blue",
     "plan-fixing-the-truck": "purple",
-    "plan-staying-the-night": "orange"
+    "plan-staying-the-night": "orange",
+    "container": "blue"
   },
   "zoom": 1
 }
@@ -67,6 +68,8 @@ You don't know what's going to happen now.
 # S A N D - D A N C E R
 
 (display:'inventory')\
+(set: $addPrompt to (either:"Snag it", "Take it", "Grab it"))\
+(set: $dropPrompt to (either:"Drop it", "Leave it", "Set it down"))\
 (display:'examine')\
 <!-- Logging -->\
 (set: $Log to (macro: any-type _toLog,[
@@ -92,7 +95,7 @@ You don't know what's going to happen now.
   ]
   (out-data:0)
 ]))\
-<!-- returns array with all elements equal to _s replaced with _r -->
+<!-- returns array with all elements equal to _s replaced with _r -->\
 (set: $substitute to (macro: any-type _s, any-type _r, array-type _a, [
   (set: _result to (a:))
   (for: each _i, ..._a)[
@@ -118,7 +121,7 @@ You don't know what's going to happen now.
   (set: _out to (str:(rotated: $cycling's _key, ..._responses)'s 1st))
   (out:)[_out]
 ]))\
-<!-- For trading memories for talents -->
+<!-- For trading memories for talents -->\
 (set:$memoryList to (macro: str-type _talent, macro-type _onDone, [
   (set:$tradeFor to _talent)
   (set:$dramaticScene to false)
@@ -136,20 +139,11 @@ You don't know what's going to happen now.
 ]))\
 <!-- linkPersist & linkRevealPersist -->\
 <!-- Support for persistent links (once clicked, continue to show revealed content) -->\
-(set: $persistCounter to (dm:))(set: $persistTotal to (dm:))(set: $visitedLinks to (ds:))\
+(set: $visitedLinks to (ds:))\
 (set: $linkPersister to (macro: str-type _linkType, str-type _title, codehook-type _content, [
     <!-- Called for each 'linkPersist' in passage -->
     (set: _page to ((passage:)'s name))
-    (if: $persistCounter does not contain _page)[(set: $persistCounter to it + (dm:_page, 0))]
-    (set: _totalLinks to _page of $persistCounter)
-    (if: $persistTotal does not contain _page)[(set: $persistTotal to it + (dm:_page, _totalLinks))]
-    (set: _linkCount to 1 + _page of $persistCounter)
-    (if: visits > 1)[<!-- handle wrap-around on future visits-->
-        (set: _linkTotal to _page of $persistTotal)
-        (if: _linkCount > _linkTotal)[(set: _linkCount to 1)]
-    ]
-    (set: $persistCounter to it + (dm:_page, _linkCount))
-    (set: _linkID to (str: _page, "-", (str:_linkCount)))
+    (set: _linkID to (str: _page, "-", (str:_title)))
     (if: $visitedLinks does not contain _linkID)[
         <!-- Not yet visited, show link -->
         (if: _linkType is 'link-reveal')[
@@ -252,7 +246,7 @@ He looks pretty pissed that you crashed into his cactus. What did grandma used t
 Oh yeah, you remember, she called them sand-dancers. This little sand-dancer still looks pissed.\
 ](else:)[\
 ### A sand-dancer
-The little sand-dancer lizard stares at you with one slitted eye]
+The little sand-dancer lizard stares at you with one slitted eye.]
 
 
 :: a can opener {"position":"1125,575","size":"100,100"}
@@ -266,8 +260,7 @@ Not much to say, a bit thread-bare, but all you have to protect you from the col
 
 
 :: a desk [fixed-in-place] {"position":"450,700","size":"100,100"}
-($first:'metal-desk')[($moveToLoc:'a flashlight','a desk')\
-($clearItemHistory:)]\
+($first:'metal-desk')[($moveToLoc:'a flashlight','a desk')]\
 ## Metal Desk
 You feel around the edge of the desk, and find that it has (link-reveal:'a drawer.')[
 You slide the drawer open by feel in the darkness. (if:($itemLoc:'a flashlight') is 'a desk')[Something large and lumpy rolls around inside - ($itemLink:'a flashlight')?](else:)[It is empty.]]
@@ -280,13 +273,20 @@ When the highway patrol pulls you over they see your kind of crazy uncombed hair
 
 :: a flashlight {"position":"325,700","size":"100,100"}
 ## Flashlight
-($first:'a flashlight')[($addToInventory:'a flashlight')Yeah, it's a flashlight all right. You grip it in sudden relief, turning it in your hands till your finger finds the switch.](else-if:$flashlightOn is true)[Emitting a good, strong beam: thank god it works.](else:)[Cold blue metal, and hefty.]
+(set: $itemIsDroppable to (macro: str-type _item, [
+  (out-data:false)<!-- don't drop flashlight -->
+]))\
+($first:'a flashlight')[($addToInventory:'a flashlight')Yeah, it's a flashlight all right. You grip it in sudden relief, turning it in your hands till your finger finds the switch.
 
+](else-if:$flashlightOn is true)[Emitting a good, strong beam: thank god it works.
+
+](else:)[Cold blue metal, and hefty.
+
+]\
 |turn-on)[(link-repeat:'Switch it on')[\
   (set:$flashlightOn to true)\
   (hide:?turn-on)\
   (show:?turn-off)\
-  ($clearItemHistory:)\
   (go-to: (passage:)'s name)\
 ]]\
 |turn-off)[(link-repeat:'Switch it off')[\
@@ -309,7 +309,7 @@ When the highway patrol pulls you over they see your kind of crazy uncombed hair
 (if: $broodedMemories's length < 2)[\
 You just can't deal with that right now. Maybe after you've spent more time brooding.
 ](else:)[\
-You open the photo, revealing an ultrasound of (link-reveal:"Ocean's baby")[ Your baby too].
+You open the photo, revealing an ultrasound of (link-reveal:"Ocean's baby.")[ Your baby too].
 
 Something about the ultrasound of Ocean's baby makes you want to brood about ($itemLink:'when you heard the news').\
 ($moveToLoc: 'when you heard the news', 'emotional baggage')\
@@ -327,11 +327,11 @@ It's full of gas, might be useful if you decide on fixing your truck and getting
 Something about the gas can makes you want to brood about ($itemLink:'road trips through the desert').
 
 
-:: a glove box [fixed-in-place] {"position":"200,1075","size":"100,100"}
+:: a glove box [fixed-in-place container] {"position":"200,1075","size":"100,100"}
 ($first:'a glove box')[\
 ($moveToLoc:'a pack of cigarettes', 'a glove box')\
 ]\
-### Inside the glove box
+### Inside the glove box is...
 ($contentsOf:'a glove box')
 
 
@@ -378,7 +378,7 @@ Something about the receipt from Big Jimmy's makes you want to brood about ($ite
 :: a roll of duct tape [fixed-in-place plan-item plan-fixing-the-truck] {"position":"1125,825","size":"100,100"}
 (if: ($itemLoc:'a roll of duct tape') is 'a hole')[\
   (if: $talents contains 'courage')[\
-    You reach down into the hole, brushing the cobwebs away impatiently, and pull out the duct tape. Taken.($addToInventory:'a roll of duct tape')($clearItemHistory:)\
+    You reach down into the hole, brushing the cobwebs away impatiently, and pull out the duct tape. Taken.($addToInventory:'a roll of duct tape')
   ](else:)[\
     ($first: 'a roll of duct tape')[You reach your hand towards the hole, then pull back with a start as you brush cobwebs. Nightmare visions of fat black spiders shudder through your brain. No way are you reaching in there.]\
     ($afterwards: 'a roll of duct tape')[Yeah, sorry, but you're not putting your hand in there.]\
@@ -401,7 +401,7 @@ Something about the rusted key makes you want to brood about ($itemLink:'meeting
 Someone left a tin can here years ago: ridged ripples run down its rusty side.
 
 
-:: a wallet {"position":"200,700","size":"100,100"}
+:: a wallet [container] {"position":"200,700","size":"100,100"}
 ($first: 'a wallet')[\
 ($moveToLoc:'a driver\'s license', 'a wallet')\
 ($moveToLoc:'a receipt from Big Jimmy\'s', 'a wallet')\
@@ -411,7 +411,7 @@ In the wallet is:
 ($contentsOf:'a wallet')
 
 
-:: a weather-worn guidebook {"position":"575,350","size":"100,100"}
+:: a weather-worn guidebook [container] {"position":"575,350","size":"100,100"}
 (set:_listOfAnimals to (macro: [
   (set: _out to '')
   (for: each _animal, ...$foundAnimals)[
@@ -434,7 +434,6 @@ Bolted to the wall, it looks like one of those 'break-in-case-of-emergency' thin
 (if: $talents contains 'strength')[You grip the mesh in one hand and pull, and realize it's so rusted you can easily peel it back. The door rips free and you drop it to the floor. The ($itemLinkAlias:'blanket', 'an emergency blanket') is yours.\
 ($addToInventory:'an emergency blanket')\
 ($removeFromGame: 'a wire mesh cage')\
-($clearItemHistory:)\
 ]\
 (else-if: ($inventory:) contains 'a rusted key')[The cage seems to be locked but you remember the rusted key you found.
 You sling the key into the lock, but as you turn it, the rusted metal snaps off inside. The crumbling fragments fall to the ground as you slam your fist against the wire mesh in frustration. This is not your day.($removeFromGame: 'a rusted key')\
@@ -626,11 +625,14 @@ The building shakes and groans as sand continues to pour in, rising higher and h
       ]\
   ]
 ]))\
-Nice thought, but the last thing you need is a sliced open hand. Maybe you could (link-show:"use something less likely to bleed",?butWhat).\
-|butWhat)[
+Nice thought, but the last thing you need is a sliced open hand. Maybe you could (link-show:"use something less likely to bleed",?butWhat).
+
+|butWhat)[\
 You pat down your pockets. Maybe you could throw something?
-(_itemsToTry:)]\
-|reportBreakingWindow)[
+(_itemsToTry:)
+
+]\
+|reportBreakingWindow)[\
 You step back and throw $heavyItem at the window, it smashes through, shattering it.($moveToLoc: $heavyItem, 'staging area')(set:$windowBroken to true)(set: $goToOnDone to 'crumbling concrete')]
 
 
@@ -870,16 +872,24 @@ your flashlight in your hand and (link-goto:'switch it on', 'base of tower')...\
 :: crumbling concrete [Tower-Vicinity Around-the-Tower] {"position":"525,825","size":"100,100"}
 # Crumbling Concrete
 This concrete building must've been some sort of utility structure for the [[huge electrical tower to the north->base of tower]], now abandoned. \
-|unbrokenWindow>[A ($linkRevealPersist:'pane of cracked glass',[(set: $windowExamined to true)(show:?examine-window)])\
+|unbrokenWindow>[A ($linkRevealPersist:'pane of cracked glass',[(set: $windowExamined to true)(show:?examined-window)])\
  sparkles faintly in the beam of your headlights.
- ]\
-|examine-window)[\
-|brokenWindow)[The empty frame of a window [[leads inside->staging area]].]\
-|unbrokenWindow>[<tw-consecutive-br/>You push your face against the dusty glass window but it is too dark to see inside.(show:?suggest-break)]
+
 ]\
-<tw-consecutive-br/>Tendrils of desert sand drift against a ($linkRevealPersist: 'boarded-up door to the northeast',[(set:$triedDoor to true)(hide: ?untriedDoor)(show: ?triedDoor)])(t8n:"dissolve")[ leading inside; you could also ]<untriedDoor|(t8n:"dissolve")[. You shove against the door with all your weight. The door won't budge. You slam your hands against the boards in frustration. I guess you could ](triedDoor|[[walk around to the east->weed strewn rust]] or [[head south->outside your truck]] back to your truck.[(t8n:'fade')+(transition-time:.5s)+(transition-delay:1s)[ Or, you could try to ($itemLink:'break the window').]](suggest-break|\
-(if:$triedDoor is true)[(hide: ?untriedDoor)(show: ?triedDoor)]\
-(if:$windowExamined is true)[(show: ?examine-window)]\
+|examined-window)[\
+|brokenWindow)[The empty frame of a window [[leads inside->staging area]].
+
+]\
+|unbrokenWindow>[You push your face against the dusty glass window but it is too dark to see inside.(show:?suggest-break)
+
+]\
+]Tendrils of desert sand drift against a ($linkRevealPersist: 'boarded-up door to the northeast',[($first:'try-door')[(set:$triedDoor to true)(hide: ?untriedDoor)(show: ?triedDoor)]])\
+|untriedDoor>[ leading inside; you could also ]\
+|triedDoor)[. You shove against the door with all your weight. The door won't budge. You slam your hands against the boards in frustration. I guess you could ]\
+[[walk around to the east->weed strewn rust]] or [[head south->outside your truck]] back to your truck.\
+|suggest-break)[(t8n:'fade')+(transition-time:.5s)+(transition-delay:.5s)[ Or, you could try to ($itemLink:'break the window').]]\
+(if:$triedDoor is true)[(set:$Log to "hiding untriedDoor")(hide: ?untriedDoor)(show: ?triedDoor)]\
+(if:$windowExamined is true)[(show: ?examined-window)]\
 (if:$windowBroken is true)[(show: ?brokenWindow)(hide: ?unbrokenWindow)(hide: ?suggest-break)](else:)[(hide: ?brokenWindow)(show:?unbrokenWindow)]
 ($youCanAlsoSee:)
 
@@ -894,7 +904,7 @@ This concrete building must've been some sort of utility structure for the huge 
 You could [[walk around to the east->you go]] or [[head south back to your truck->you go]].
 
 
-:: emotional baggage [fixed-in-place] {"position":"950,100","size":"100,100"}
+:: emotional baggage [fixed-in-place container] {"position":"950,100","size":"100,100"}
 ### Emotional baggage
 Your guidance counselor used to say you're always carrying it with you. You imagine it's kind of ugly, lumpy, and green, and definitely has a stuck zipper.
 (if: ($itemsIn:'emotional baggage')'s length > 1)[\
@@ -905,30 +915,33 @@ You are pretty sure there is plenty of other stuff burried in that bag, but you 
 
 
 :: examine {"position":"575,100","size":"100,100"}
-(set: $showItem to (macro: str-type _item, [
- (if: $itemHistory is 0)[($clearItemHistory:)]
-  (if: $itemHistory does not contain _item)[
-    (set: $itemHistory to it + (a:_item))
+(set: $updateContainers to (macro: str-type _item, [
+  (if: $itemContainers is 0)[(set: $itemContainers to (a:))]
+  (if: $itemContainers's length > 0)[
+    <!-- if last container doesn't contain item, clear all -->
+    (set: _lastContainer to $itemContainers's last)
+    (if: ($itemLoc:_item) is not _lastContainer)[
+      (set: $itemContainers to (a:))
+    ]
   ]
-  (show: ?examine)
-  (replace: ?examine-content)[\
-    ($itemDefined:_item)[(display:_item)](else:)[\
-    ''(upperfirst:_item)''
-    
-    (either:
-    "Not much to say about it.",
-    "You don't see anything interesting about it.",
-    "Pretty ordinary.",
-    "Yep."
-    )\
-    ]\
-    ==><=
-    ($itemLinks: _item)
+  (if: (passage:_item)'s tags contains 'container')[
+    (set: $itemContainers to it + (a:_item))
   ]
   (out-data:'')
 ]))\
-(set: $clearItemHistory to (macro: [
-  (set: $itemHistory to (a:))
+(set: $showItem to (macro: str-type _item, [
+  (show: ?examine)
+  (if: ($itemDefined:_item))[
+    ($updateContainers: _item)
+  ](else:)[
+    (set: $nonExistentItem to (upperfirst:_item))
+    (set: _item to 'nonexistent item')
+  ]
+  (replace: ?examine-content)[\
+    (display:_item)
+    ==><=
+    ($itemLinks: _item)
+  ]  
   (out-data:'')
 ]))\
 (set: $createExam to (macro: str-type _placement, dm-type _style,[
@@ -936,25 +949,27 @@ You are pretty sure there is plenty of other stuff burried in that bag, but you 
 ]))\
 (set: $itemLinks to (macro: str-type _item, [
   (set: _ok to [
-    (if: $itemHistory's length > 1)[
-      (set: $itemHistory to it - (a:$itemHistory's last))
-      ($showItem:$itemHistory's last)
-    ](else:)[
-      ($clearItemHistory:)
-      (hide:?examine)
-      (if: $goToOnDone is not 0)[
-        (set: _temp to $goToOnDone)
-        (set: $goToOnDone to 0)
-        (go-to: _temp)
-      ]
+    (hide:?examine)
+    (if: $itemContainers's length > 0)[
+      <!-- Special case going back to container -->
+      (set: _lastContainer to $itemContainers's last)
+      (set: $itemContainers to it - (a:_lastContainer))
+      (if: _item is not _lastContainer)[($showItem:_lastContainer)]
+    ](else-if: $goToOnDone is not 0)[
+      <!-- Special case refreshing passage (such as when breaking window) -->
+      (set: _temp to $goToOnDone)
+      (set: $goToOnDone to 0)
+      (go-to: _temp)
     ]
   ])
-  (set: _addPrompt to (either:"Snag it", "Take it", "Grab it"))
-  (set: _add to [(link:_addPrompt)[($addToInventory:_item)(_ok)]])
-  (set: _dropPrompt to (either:"Drop it", "Leave it", "Set it down"))
-  (set: _drop to [(link:_dropPrompt)[($removeFromInventory:_item)(_ok)]])
-  (set: _throwable to ())
-  (set: _throw to [])
+  (if: $addPrompt is 0)[
+    (set: $addPrompt to (either:"Snag it", "Take it", "Grab it"))
+  ]
+  (set: _add to [(link:$addPrompt)[($addToInventory:_item)(_ok)]])
+  (if: $dropPrompt is 0)[
+    (set: $dropPrompt to (either:"Drop it", "Leave it", "Set it down"))
+  ]
+  (set: _drop to [(link:$dropPrompt)[($removeFromInventory:_item)(_ok)]])
   (out:)[
     (if: ($itemIsDroppable: _item))[_drop | ]\
     (if: ($itemIsObtainable: _item))[_add | ]\
@@ -964,6 +979,11 @@ You are pretty sure there is plenty of other stuff burried in that bag, but you 
 
 
 :: footer [footer] {"position":"825,100","size":"100,100"}
+(if: $dramaticScene is true)[\
+(set: $itemIsDroppable to (macro: str-type _item, [
+  (out-data:false)<!-- nothing droppable in dramatic scenes -->
+]))\
+]\
 <tw-consecutive-br/>\
 (display:'weather')\
 (display:'pursuit')\
@@ -1175,11 +1195,11 @@ And that was maybe you think the first time she said she loved you, and you said
 (set: $contentsOfList to (macro: str-type _container, macro-type _link, [
   (set: _links to ($itemsAsLinks:_container, _link))\
   (if: _links's length is 0)[
-    (out:)[nothing]
+    (out:)[$tab - nothing]
   ](else:)[
     (out:)[\
       (for: each _i, ..._links)[$tab - _i
-      ]\
+]\
     ]
   ]
 ]))\
@@ -1223,7 +1243,7 @@ A huge metal barrel stands upright and intact nearby, (if: $barrelMoved)[directl
 ]\
 |strong-push)[Heaving, you push against the barrel, and with a horrible grating noise, it slides across the roof till it rests underneath the metal rungs.(set: $barrelMoved to true)
 ]\
-|climb-right)[($clearItemHistory:)You climb up on the barrel, reach, grab the bottom rungs, and [[pull yourself up->Control Center]]
+|climb-right)[You climb up on the barrel, reach, grab the bottom rungs, and [[pull yourself up->Control Center]]
 ]
 
 
@@ -1234,13 +1254,24 @@ A huge metal barrel stands upright and intact nearby, (if: $barrelMoved)[directl
 (set: $foundAnimals to (ds:'lizard, brown'))\
 ]\
 ## Middle of Nowhere
-You've smashed up against a tall Saguaro, which is all you can see out the windshield except a few feet of desert sand, then blackness. Hell, you must have driven off the road and crashed. Ocean keeps telling you this night commute on this lonely highway's gonna kill you; maybe you should start listening.
+You've smashed up against a tall Saguaro, which is all you can see out the windshield except a few feet of desert sand, then blackness.($first:'driven-off-the-road')[ Hell, you must have driven off the road and crashed. Ocean keeps telling you this night commute on this lonely highway's gonna kill you; maybe you should start listening.]
 
 Through the windshield, you see ($itemLinkAlias:'a little brown-colored lizard','a brown lizard') clinging frantically to the tall Saguaro.
 ($youCanAlsoSee:)
 
 [[Get out of the truck ->outside your truck]]($first:'in-truck')[and see how bad it is...]
 <!--TODO See Middle of Nowhere for more description based on light and first time etc.-->
+
+
+:: nonexistent item [fixed-in-place] {"position":"1200,100","size":"100,100"}
+<!-- for items with no passage, e.g. 'a withered cactus' -->\
+## $nonExistentItem
+(either:
+  "Not much to say about it.",
+  "You don't see anything interesting about it.",
+  "Pretty ordinary.",
+  "Yep."
+)
 
 
 :: open desert {"position":"325,225","size":"100,100"}
@@ -1390,7 +1421,7 @@ You try to flee and instantly teeth and claws block your path; you pull back to 
 # Looking around
 The tire tracks [[from the south->backtracking]] stop abruptly here, but where the hell are you? The desert sand and clumps of pale sagebrush are all your dimming headlights pick out before barely reaching the concrete building to [[the north->crumbling concrete]].
 
-Your poor ($linkRevealPersist:'old pickup truck',[(set: $truckExamined to true)(show: ?examine-truck)]) ticks and groans, smashed gracelessly against a tall Saguaro; whiffs of evaporating gasoline linger in the chill air.[
+Your poor ($linkRevealPersist:'old pickup truck',[(set: $truckExamined to true)(show: ?examine-truck)]) ticks and groans, smashed gracelessly against a tall Saguaro; ($linkRevealPersist:'whiffs of evaporating gasoline',[(show:?whiffs-of-gas)]) linger in the chill air.[ Fading away in the chill night air, but enough to tell you something on your truck's busted bad.](whiffs-of-gas|[
 
 Getting down on your knees in the cold sand, you look underneath. Sure enough; you ripped up the fuel line and all your gas has drained away, sucked dry by the thirsty desert sand. You'll need to find some way to patch up the line, plus some fuel, to have any hope of fixing her.](examine-truck|
 
@@ -1539,7 +1570,7 @@ Out of the corner of your eye you spot a glimpse of something moving in the dark
 
 
 :: report lighter [fixed-in-place] {"position":"575,1075","size":"100,100"}
-($clearItemHistory:)(set: _litBy to ($locationIsLit:))\
+(set: _litBy to ($locationIsLit:))\
 (set: _loc to (passage:)'s name)\
 (unless: ($inventory:) contains 'a lighter')[
 You pat your pockets, but can't seem to find your lighter.
@@ -1555,8 +1586,6 @@ You flick it open and shut a few times, an old habit.]
 
 
 :: report smoking [fixed-in-place] {"position":"450,1075","size":"100,100"}
-<!-- clearItemHistory so that clicking Done takes you to the passage, not back to the glove box or wherever you started -->\
-($clearItemHistory:)\
 (set: _reportLight to (macro:[
   (set: _litBy to ($locationIsLit:))
   (if: _litBy is 'brightly')[
@@ -1585,29 +1614,27 @@ You flick it open and shut a few times, an old habit.]
     (out-data:"you should switch on those emergency lights in the storage room so you can get a better look at things")
   ](else-if: $conversationOver is not true)[
     (out-data:"you maybe should see if you can call for help with that emergency radio in the break room")
-  ](else-if:(not (visited:'a roll of duct tape'))[
+  ](else-if: ($itemLoc:'a roll of duct tape') is 'offstage')[
     (out-data:"you should investigate that hole in the floor of the staging area")
-  ](else-if:(passage:)'s tags does not contain 'Around-the-Tower')[
+  ](else-if: not (visited: 'open desert'))[
     (out-data:"you should see if the open desert has anything to offer")
-  ](else-if:not (visited:'open desert')[
-    (out-data:"you should try to catch up with that weird shadow")
-  ](else-if:($talents contains 'strength' and ($itemLoc:'an emergency blanket') is 'offstage')[
+  ](else-if: $talents contains 'strength' and ($itemLoc:'an emergency blanket') is 'offstage')[
     (out-data:"you're strong enough now to bust open that mesh cage with the blanket inside")
-  ](else-if:($talents contains 'courage' and ($itemLoc:'a roll of duct tape') is 'offstage')[
+  ](else-if: $talents contains 'courage' and ($itemLoc:'a roll of duct tape') is 'offstage')[
     (out-data:"you're brave enough to reach for that duct tape in the hole in the floor now")
-  ](else-if:($talents contains 'luck' and ($itemLoc:'some canned oranges') is 'offstage')[
-    (out-data:"you're strong enough now to bust open that mesh cage with the blanket inside")
-  ](else-if:($rainstorm > 0)[
+  ](else-if: $rainstorm > 0)[
     (out-data:"you should look around inside while you wait out this storm")
-  ](else-if:($temptation is 0)[
+  ](else-if: $temptation is 0)[
     (out-data:"you should see if you can see anything from that control room now that the rain has stopped")
-  ](else-if:($temptation is 1)[
+  ](else-if: $temptation is 1)[
     (out-data:"you ought to head back to the desert and see if you can find that rabbit dude again")
-  ](else-if:($talents contains 'scent' and (not (visited:'Control Center'))[
+  ](else-if: $talents contains 'luck' and ($itemLoc:'some canned oranges') is 'offstage')[
+    (out-data:"you're lucky enough now to find something to eat in the Storage room")
+  ](else-if: $talents contains 'scent' and not (visited:'Control Center'))[
     (out-data:"you should try to get up that ladder above the roof")
-  ](else-if:($talents contains 'scent' and ($itemLoc:'a gas can') is 'offstage')[
+  ](else-if:$talents contains 'scent' and ($itemLoc:'a gas can') is 'offstage')[
     (out-data:"you should try to sniff out that gas now")
-  ](else-if:($itemsIn:'emotional baggage')'s length < 3))[
+  ](else-if:($itemsIn:'emotional baggage')'s length < 3)[
     (out-data:'you could look around more, see if there is anything you could use')
   ](else:)[
     (out-data:"you could... man, I don't know...")
@@ -1883,7 +1910,7 @@ breaches the sand and [[rises to the surface ->crumbling concrete-sd]].
 (set: _radioLeftOff to ", which is weird because you're damn sure you turned it off")]]\
   (if: $sinisterRadio is 1)[\
   <tw-consecutive-br/>\
-  With a sudden growl of static the radio springs to life[_radioLeftOff] and it freaks the hell out of you. The voice weaves in and out of crazy whirling distortion and shifting blasts of static. 'Hey... receiving? ...never told... you'll never, never--' A wail like an 8-bit banshee screams through the signal. '...waste of time... who do you think?...' Static, static. 'Very soon now, Nak... akaibito... very...'
+  With a sudden growl of static the radio springs to life[_radioLeftOff] and it freaks the hell out of you. The voice weaves in and out of crazy whirling distortion and shifting blasts of static. 'Hey... receiving? ...never told... you'll never, never' A wail like an 8-bit banshee screams through the signal. '...waste of time... who do you think?...' Static, static. 'Very soon now, Nak... akaibito... very...'
 
   Uh. You're pretty sure you never told that dude your name. Maybe you're just hearing things.\
   (set: $sinisterRadio to it + 1)\
@@ -2107,6 +2134,7 @@ The distant figure waves again, \
   (go-to: 'the burrow')\
  ]
  (link:"Coyote-Courage")[\
+  (mock-visits:"open desert", "crumbling concrete", "the burrow", "storage room", "break room")
   (set: $emergencyLightsOn to true)\
   (set: $conversationOver to true)\
   (set: $memoryToTrade to 'You ain\'t seen nothing yet')\
@@ -2117,6 +2145,7 @@ The distant figure waves again, \
   (go-to: 'backtracking')\
 ]
  (link:"Coyote-Strength")[\
+  (mock-visits:"open desert", "crumbling concrete", "the burrow", "storage room", "break room")
   (set: $emergencyLightsOn to true)\
   (set: $conversationOver to true)\
   (set: $memoryToTrade to 'You ain\'t seen nothing yet')\
@@ -2124,7 +2153,7 @@ The distant figure waves again, \
   (set: $talents to it + (ds:'strength'))\
   (set: $rainstorm to 1)\
   (set: $sinisterRadio to 1)\
-  (go-to: 'backtracking')\
+  (go-to: 'break room')\
 ]
 (link:"Sinister Radio")[\
   (set: $emergencyLightsOn to true)\
