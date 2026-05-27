@@ -4,7 +4,7 @@ Recreating Aaron Reed and Alexei Othenin-Girard's Sand-dancer in [Twine](https:/
 
 ## The original
 
-[*Sand-dancer*](https://sand-dancer.textories.com/) was created to illustrate [Aaaron Reed](https://aaronareed.net/)'s [*Creating Interactive Fiction with Inform 7*](https://inform7.textories.com/).
+[*Sand-dancer*](https://sand-dancer.textories.com/) was created to illustrate [Aaron Reed](https://aaronareed.net/)'s [*Creating Interactive Fiction with Inform 7*](https://inform7.textories.com/).
 
 *Creating Interactive Fiction with Inform 7* was first published in 2010 and is sadly out of print, but Aaron's [companion site](https://inform7.textories.com/sand-dancer/) and the source code are still available. You can play the finished game at [sand-dancer.textories.com](https://sand-dancer.textories.com/)
 
