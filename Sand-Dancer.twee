@@ -64,8 +64,8 @@ You don't know what's going to happen now.
 ...but it's too late, you're crashing, you're crashing, you crash...
 
 
-=><=============
-# S A N D - D A N C E R
+
+# (align:"=><=")+(box:"X")[S&nbsp;A&nbsp;N&nbsp;D - D&nbsp;A&nbsp;N&nbsp;C&nbsp;E&nbsp;R]
 
 (display:'inventory')\
 (set: $addPrompt to (either:"Snag it", "Take it", "Grab it"))\
@@ -360,7 +360,6 @@ You're kind of trying to quit, but man, you could really go for one right now. (
 
 You could (link:'light one up now')[($addToInventory:'a pack of cigarettes')($showItem:'report smoking'))].\
 ](else:)[But you are totally out.]
-
 
 
 :: a piece of jade [item] {"position":"200,350","size":"100,100"}
@@ -1552,11 +1551,9 @@ A ($itemLinkAlias:'brown-colored lizard', 'a brown lizard') clings to a tall Sag
   (out:)[(link-goto:(_dir),'open desert')]
 ]))\
 (if: (_showPursuit:))[\
-($first:'in-pursuit')[<tw-consecutive-br/>\
-Out of the corner of your eye you spot a glimpse of something moving in the darkness, off in the desert to the (_linkToPursuit:).\
-<tw-consecutive-br/>\
-](else:)[\
-<tw-consecutive-br/>\
+($first:'in-pursuit')[
+Out of the corner of your eye you spot a glimpse of something moving in the darkness, off in the desert to the (_linkToPursuit:).
+](else:)[
 (either:
 'You see that weird movement again',
 'There it is again',
@@ -1565,7 +1562,7 @@ Out of the corner of your eye you spot a glimpse of something moving in the dark
 'out in the shadows',
 'off in the desert'
 ) to the (_linkToPursuit:).
-]<tw-consecutive-br/>\
+]
 ]
 
 
